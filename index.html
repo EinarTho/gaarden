@@ -229,7 +229,7 @@
     width: clamp(26px, 6.4cqmin, 60px); aspect-ratio: 1;
     border-radius: 50%;
     background: #fff;
-    padding: 6%;
+    padding: clamp(2px, .45cqmin, 4px); /* fast mål: prosent regnes av hele raden og får den til å vokse */
     filter: grayscale(1);
     opacity: .4;
     transition: opacity .3s, filter .3s;
