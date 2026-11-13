@@ -215,6 +215,7 @@
   .lvl2 .l2 { display: block; }
   .lvl2 .l1, .lvl2 .badges { display: none; }
   .scene.lvl2 { --grass: #a9c95a; --grass-dark: #86a83f; --sky-top: #f3a978; --sky-low: #fde3c4; }
+  .power { position: absolute; left: 0; bottom: 36cqh; width: 800cqh; height: 44cqh; pointer-events: none; opacity: .85; }
   .runner { position: absolute; left: 0; z-index: 3; cursor: pointer; }
   .runner > div { animation: gallop .22s ease-in-out infinite alternate; transform-origin: 30% 100%; }
   .runner > div > svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -1012,6 +1013,22 @@
   world.appendChild(beamEl);
   const waterBar = document.getElementById('water');
   const drops = Array.from({ length: 5 }, () => { const i = document.createElement('i'); i.innerHTML = DROP; waterBar.appendChild(i); return i; });
+
+  // Høyspentledning langt bak på åsene: gittermaster med hengende ledninger
+  {
+    const xs = [20, 140, 260, 380, 500, 620, 740];
+    const mast = x => `<path d="M${x - 5} 44 ${x - 1.2} 5H${x + 1.2}L${x + 5} 44" fill="none"/>` +
+      `<path d="M${x - 4.4} 38 ${x + 3.8} 30 ${x - 3.2} 22 ${x + 2.8} 15 ${x - 2} 9M${x + 4.4} 38 ${x - 3.8} 30 ${x + 3.2} 22 ${x - 2.8} 15 ${x + 2} 9" fill="none" stroke-width=".22"/>` +
+      `<path d="M${x - 7.5} 9H${x + 7.5}M${x - 5.8} 14H${x + 5.8}M${x} 5V1.5M${x - 7.5} 9 ${x - 1.4} 6M${x + 7.5} 9 ${x + 1.4} 6" fill="none"/>`;
+    const wire = (a, b, dx, y, sag) => `<path d="M${a + dx} ${y}Q${(a + b) / 2 + dx} ${y + sag} ${b + dx} ${y}" fill="none" stroke-width=".22"/>`;
+    let svg = '';
+    xs.forEach((x, i) => {
+      svg += mast(x);
+      const n = xs[i + 1];
+      if (n) svg += wire(x, n, -7.5, 9, 7) + wire(x, n, 7.5, 9, 7) + wire(x, n, -5.8, 14, 6.5) + wire(x, n, 5.8, 14, 6.5);
+    });
+    hills.insertAdjacentHTML('afterbegin', `<svg class="power l2" viewBox="0 0 800 44" aria-hidden="true"><g stroke="#66707c" stroke-width=".4" stroke-linecap="round" stroke-linejoin="round">${svg}</g></svg>`);
+  }
 
   // Hester som galopperer fram og tilbake på jordet
   const HORSE_COLORS = ['#b8763f', '#5a3420', '#e8e2d6', '#3b3b3b', '#c98a4b', '#8a5a3a', '#f0d9b5'];
