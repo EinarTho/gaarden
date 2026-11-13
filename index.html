@@ -990,7 +990,7 @@
     { id: 'vann',    x: 348, w: 5,  b: 11, z: 4, art: FOOD.vann },
     { id: 'naboer',  x: 382, w: 23, b: 5,  z: 5, art: NABOER },
     { id: 'hus2',    x: 418, w: 44, decor: true, art: HUS2 },
-    { id: 'ioniq',   x: 466, w: 42, b: 4,  z: 3, decor: true, art: IONIQ },
+    { id: 'ioniq',   x: 466, w: 42, b: 4,  z: 3, art: IONIQ },
   ].map(p => ({ ...p, l2: true }));
   const placeEls2 = PLACES2.map(makePlace);
   const L2 = id => placeEls2.find(e => e.dataset.id === id);
@@ -1003,11 +1003,11 @@
     world.appendChild(el);
     return el;
   };
-  const satEl = skyThing('sat', SAT, 447, 5, 13);
-  const wifiEl = skyThing('wifi', WIFI, 388, 12, 14);
+  const satEl = skyThing('sat', SAT, 447, 14, 13);
+  const wifiEl = skyThing('wifi', WIFI, 388, 15, 14);
   const beamEl = document.createElement('div');
   beamEl.className = 'beam l2';
-  Object.assign(beamEl.style, { left: `${453 - .6}cqh`, top: '15cqh', height: '27cqh' });
+  Object.assign(beamEl.style, { left: `${453 - .6}cqh`, top: '24cqh', height: '18cqh' });
   beamEl.hidden = true;
   world.appendChild(beamEl);
   const waterBar = document.getElementById('water');
@@ -1352,6 +1352,11 @@
     hoy2(el) { restart(el, 'wiggle'); SFX.rasle(); if (!rocketFound) { restart(rocketEl, 'jump'); arrive(takeRocket); } },
     naboer() { walkTo(naboEl._place.x - 6); arrive(deliver); },
     tesla(el) { SFX.pip(); restart(el, 'unlock'); arrive(() => takeTesla(el)); },
+    // Byttet skjer bare når hun trykker på selve Ioniqen, så den er i bildet
+    ioniq(el) {
+      if (inParade('tesla') && !teslaDone) { walkTo(el._place.x - 8); arrive(swapCars); }
+      else { restart(el, 'wiggle'); SFX.pip(); }
+    },
     pappa(el) { restart(el, 'jump'); SFX.boing(); arrive(() => joinFamily('pappa')); },
     bil(el) {
       if (inParade('pappa')) { arrive(board); return; }
@@ -1694,7 +1699,7 @@
     ioniqAnim?.cancel(); ioniqAnim = null;
     ioniqEl.style.visibility = '';
     teslaFol?.el.remove(); teslaFol = null;
-    placeEls2.forEach(e => e.classList.remove('away', 'happy', 'cheer', 'hungry', 'online'));
+    placeEls2.forEach(e => e.classList.remove('away', 'happy', 'cheer', 'hungry', 'online', 'wiggle'));
     satEl.classList.remove('on');
     wifiEl.classList.remove('on');
     beamEl.hidden = true;
@@ -1744,12 +1749,14 @@
       teslaFol = parade.find(f => f.id === 'tesla');
       teslaFol.el.classList.add('car');
       SFX.surr();
-      naboEl.classList.add('hungry');
+      ioniqEl.classList.add('hungry');
     }, 700);
   }
   // Ioniqen smeller i en tegneserie-eksplosjon, og Teslaen ruller inn på plassen
   function swapCars() {
+    if (teslaDone || !teslaFol) return;
     teslaDone = true;
+    ioniqEl.classList.remove('hungry');
     const f = teslaFol;
     parade.splice(parade.indexOf(f), 1);
     const cx = ioniqEl.offsetLeft + ioniqEl.offsetWidth / 2, cy = ioniqEl.offsetTop + ioniqEl.offsetHeight * .55;
@@ -1826,12 +1833,7 @@
       }, 600);
       if (delivered >= 5) watered = true;
     }
-    let wait = carried > 0 ? 1400 : 200;
-    if (inParade('tesla') && !teslaDone) {
-      did = true;
-      setTimeout(swapCars, wait);
-      wait += 4400;
-    }
+    const wait = carried > 0 ? 1400 : 200;
     if (held === 'rakett' && !rocketDone) {
       did = true;
       setHeld(null);
