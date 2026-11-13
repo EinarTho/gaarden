@@ -248,6 +248,12 @@
   .naboer .glad, .naboer .scr-on, .thing.happy .sad, .thing.happy .scr-off { display: none; }
   .thing.happy .glad, .thing.happy .scr-on { display: inline; }
   .thing.cheer > svg { animation: hop .3s ease-in-out infinite alternate; }
+  .follower.car.walking > div { animation: none; }
+  .thing.unlock .tlight, .follower.unlock .tlight { animation: blink .15s linear 6 alternate; }
+  .boom { position: absolute; z-index: 8; pointer-events: none; border-radius: 50%; }
+  .boom.flash { background: radial-gradient(circle, #fff7c2 0 25%, #ffcf4a 45%, #ff7a2e 70%, transparent 72%); animation: flash .7s ease-out forwards; }
+  .boom.cloud { background: rgb(120 120 125 / .85); animation: cloud 1.8s ease-out forwards; }
+  .boom.star { border-radius: 0; background: #ffd34d; clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
   .rocket-fly { position: absolute; left: 0; top: 0; width: 4.6cqh; z-index: 7; pointer-events: none; }
   .rocket-fly svg { display: block; width: 100%; overflow: visible; }
   .flame { visibility: hidden; transform-box: fill-box; transform-origin: 50% 0; }
@@ -396,6 +402,8 @@
   @keyframes blink { to { opacity: .35; } }
   @keyframes beam { to { background-position: 0 2.8cqh; } }
   @keyframes flicker { to { transform: scaleY(1.35); } }
+  @keyframes flash { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+  @keyframes cloud { from { transform: scale(.3); opacity: .9; } to { transform: translateY(-10cqh) scale(2.2); opacity: 0; } }
   @keyframes hop { from { transform: translateY(0); } to { transform: translateY(-9%); } }
   @keyframes puff { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(2cqh, -10cqh) scale(2.2); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
@@ -810,6 +818,23 @@
   const NABOER = `<svg class="naboer" viewBox="0 0 84 124" aria-hidden="true">
       ${person(0, 14, 1, '#1f5a45', '#2f4f7f', '', '<path d="M8.5 23C8 33 14 37.5 20 37.5S32 33 31.5 23C30 29 26 31 20 31S10 29 8.5 23Z" fill="#b07e48"/><path d="M7 17C7 5 14 3 20 3S33 5 33 17Z" fill="#2f4fa8"/><rect x="6" y="13" width="28" height="6.5" rx="3" fill="#2a46a0"/><rect x="24" y="14" width="5" height="4" fill="#fff" stroke-width="1.2"/><g fill="rgb(255 255 255 / .25)" stroke="#2b2b2b" stroke-width="1.8"><circle cx="15.5" cy="22" r="3.8"/><circle cx="24.5" cy="22" r="3.8"/><path d="M19.3 22H20.7" fill="none"/></g>')}
       ${person(42, 18, .96, '#cbbfa8', '#3a2f2a', '<path d="M5 22C3 8 12 5 20 5S37 8 35 22C37 30 37 39 33 44 30 41 31 35 30 31H10C9 35 10 41 7 44 3 39 3 30 5 22Z" fill="#9a6a43"/>', '<path d="M11 35C15 40 25 40 29 35L28 44H12Z" fill="#3b3a2c"/><path d="M14 39 15 47M20 40V48M26 39 25 47" stroke="#8a7a4a" stroke-width="1.4"/><path d="M7 22C6 10 13 7 20 7S34 10 33 22C31 15 26 11 21 11 15 11 10 15 7 22Z" fill="#9a6a43"/><g fill="rgb(255 255 255 / .25)" stroke="#c9a24a" stroke-width="1.2"><circle cx="15.5" cy="22" r="3.8"/><circle cx="24.5" cy="22" r="3.8"/><path d="M19.3 22H20.7" fill="none"/></g>', BABY)}</svg>`;
+  const IONIQ = `<svg viewBox="0 0 220 110" aria-hidden="true"><g ${INK}>
+      <path d="M10 84V54L46 46 80 22H170L204 46C210 48 212 52 212 58V84Z" fill="#9aa1a8"/>
+      <path d="M62 46 86 28H128V46ZM134 28H166L188 46H134Z" fill="#3a434d"/>
+      <circle cx="52" cy="86" r="18" fill="#1e1e1e"/><circle cx="172" cy="86" r="18" fill="#1e1e1e"/></g>
+      <path d="M40 86H64M52 74V98M162 86H184M172 74V98" stroke="#c9ced6" stroke-width="3"/>
+      <g fill="#f4f4f4"><rect x="196" y="54" width="4" height="4"/><rect x="202" y="54" width="4" height="4"/><rect x="196" y="60" width="4" height="4"/><rect x="202" y="60" width="4" height="4"/></g>
+      <g fill="#e63b2e"><rect x="12" y="54" width="4" height="4"/><rect x="12" y="60" width="4" height="4"/></g>
+      <path d="M90 52 70 80M84 60H120M150 60H180" stroke="#7d848b" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+  const TESLA = `<svg viewBox="0 0 220 110" aria-hidden="true"><g ${INK}>
+      <path d="M8 86V70C8 62 16 58 40 54L80 32C98 24 132 22 158 30L196 52C210 56 214 62 214 72V86Z" fill="#fbfbfb"/>
+      <path d="M86 36C102 29 130 28 152 34L180 52H72Z" fill="#2b3440"/>
+      <circle cx="52" cy="88" r="17" fill="#1e1e1e"/><circle cx="172" cy="88" r="17" fill="#1e1e1e"/></g>
+      <circle cx="52" cy="88" r="8" fill="#c9ced6"/><circle cx="172" cy="88" r="8" fill="#c9ced6"/>
+      <path d="M124 30V52" stroke="#fbfbfb" stroke-width="3"/>
+      <path d="M96 62H110M138 62H152" stroke="#c9ced6" stroke-width="2.4" stroke-linecap="round"/>
+      <path class="tlight" d="M198 58C204 59 208 61 210 64" stroke="#ffe9a8" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+      <path d="M10 64H18" stroke="#e63b2e" stroke-width="4" stroke-linecap="round"/></svg>`;
   const SAT = `<svg viewBox="0 0 60 44" aria-hidden="true"><g ${INK}>
       <rect x="2" y="14" width="16" height="12" fill="#3f6fb6"/><rect x="42" y="14" width="16" height="12" fill="#3f6fb6"/>
       <path d="M18 20H21M39 20H42M30 9V3" fill="none"/>
@@ -878,6 +903,7 @@
     hane: [ART.hane, 7], hone: [ART.hone, 7], and: [ART.and, 7],
     hest: [quad({ face: 'hest', fill: '#b8763f', leg: '#b8763f', hoof: '#4a2b18', legH: 46, hx: 116, hy: -4, hs: .8,
       tail: `<path d="M32 78C16 86 14 104 18 118" fill="none" stroke="#4a2b18" stroke-width="10"/>` }), 14],
+    tesla: [TESLA, 40],
     katt: [quad({ face: 'katt', fill: '#f0a04b', leg: '#f0a04b', hoof: '#f0a04b', legH: 36, hy: 8, hs: .8,
       tail: `<path d="M32 84C12 80 8 52 22 42" fill="none" stroke-width="13"/><path d="M32 84C12 80 8 52 22 42" fill="none" stroke="#f0a04b" stroke-width="8"/>` }), 9],
   };
@@ -934,7 +960,7 @@
   const placeEls = PLACES.map(makePlace);
 
   // ---------- Level 2: en annen gård ----------
-  const WORLD2 = 480;
+  const WORLD2 = 530;
   const PLACES2 = [
     { id: 'bil2',    x: 4,   w: 84, b: 2,  z: 4, decor: true, art: BIL },
     { id: 'vann',    x: 118, w: 5,  b: 11, z: 4, art: FOOD.vann },
@@ -942,14 +968,16 @@
     { id: 'vann',    x: 222, w: 5,  b: 11, z: 4, art: FOOD.vann },
     { id: 'rakett',  x: 259, w: 5,  b: 17, z: 4, art: RAKETT },
     { id: 'hoy2',    x: 252, w: 16, b: 10, z: 5, art: FOOD.hoy },
-    { id: 'vann',    x: 300, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'vann',    x: 286, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'tesla',   x: 300, w: 40, b: 3,  z: 3, art: TESLA },
     { id: 'vann',    x: 348, w: 5,  b: 11, z: 4, art: FOOD.vann },
     { id: 'naboer',  x: 382, w: 23, b: 5,  z: 5, art: NABOER },
     { id: 'hus2',    x: 418, w: 44, decor: true, art: HUS2 },
+    { id: 'ioniq',   x: 466, w: 42, b: 4,  z: 3, decor: true, art: IONIQ },
   ].map(p => ({ ...p, l2: true }));
   const placeEls2 = PLACES2.map(makePlace);
   const L2 = id => placeEls2.find(e => e.dataset.id === id);
-  const car2El = L2('bil2'), rocketEl = L2('rakett'), naboEl = L2('naboer'), hus2El = L2('hus2');
+  const car2El = L2('bil2'), rocketEl = L2('rakett'), naboEl = L2('naboer'), hus2El = L2('hus2'), teslaEl = L2('tesla'), ioniqEl = L2('ioniq');
   const skyThing = (cls, art, left, top, w) => {
     const el = document.createElement('div');
     el.className = `sky-thing ${cls} l2`;
@@ -1118,6 +1146,13 @@
       tone({ type: 'sawtooth', f: [[0, 60], [1, 220]], dur: 2.4, attack: .3, gain: .12, filters: [['lowpass', 600, 1]] });
       return 2.6;
     },
+    pip() { [0, .18].forEach(at => tone({ at, type: 'sine', f: [[0, 1760], [1, 1760]], dur: .1, attack: .005, gain: .2 })); return .3; },
+    surr() { tone({ type: 'sine', f: [[0, 220], [1, 880]], dur: 1.6, attack: .3, gain: .12 }); return 1.6; },
+    bom() {
+      tone({ noise: true, dur: 1.4, attack: .005, gain: .7, filters: [['lowpass', 900, .8, [[1, 120]]]] });
+      tone({ type: 'sine', f: [[0, 90], [1, 30]], dur: .8, attack: .005, gain: .8 });
+      return 1.4;
+    },
     krasj() {
       tone({ noise: true, dur: .5, attack: .005, gain: .55, filters: [['bandpass', 1100, .8, [[1, 300]]]] });
       tone({ type: 'sine', f: [[0, 120], [1, 45]], dur: .35, attack: .005, gain: .6 });
@@ -1258,6 +1293,7 @@
     rakett() { arrive(takeRocket); },
     hoy2(el) { restart(el, 'wiggle'); SFX.rasle(); if (!rocketFound) { restart(rocketEl, 'jump'); arrive(takeRocket); } },
     naboer() { walkTo(naboEl._place.x - 6); arrive(deliver); },
+    tesla(el) { SFX.pip(); restart(el, 'unlock'); arrive(() => takeTesla(el)); },
     pappa(el) { restart(el, 'jump'); SFX.boing(); arrive(() => joinFamily('pappa')); },
     bil(el) {
       if (inParade('pappa')) { arrive(board); return; }
@@ -1569,7 +1605,7 @@
     driving = false;
   }
   // ---------- Level 2: bilen kommer, familien går ut ----------
-  let water = 0, delivered = 0, watered = false, online = false, rocketFound = false;
+  let water = 0, delivered = 0, watered = false, online = false, rocketFound = false, rocketDone = false, teslaDone = false, ioniqAnim = null, teslaFol = null;
   function startLevel2() {
     resetGame();
     level = 2;
@@ -1596,7 +1632,10 @@
   }
   function resetLevel2() {
     water = delivered = 0;
-    watered = online = rocketFound = false;
+    watered = online = rocketFound = rocketDone = teslaDone = false;
+    ioniqAnim?.cancel(); ioniqAnim = null;
+    ioniqEl.style.visibility = '';
+    teslaFol?.el.remove(); teslaFol = null;
     placeEls2.forEach(e => e.classList.remove('away', 'happy', 'cheer', 'hungry', 'online'));
     satEl.classList.remove('on');
     wifiEl.classList.remove('on');
@@ -1637,6 +1676,82 @@
     setHeld('rakett');
     naboEl.classList.add('hungry');
   }
+  function takeTesla(el) {
+    if (inParade('tesla') || teslaDone) return;
+    SFX.pip();
+    restart(el, 'unlock');
+    setTimeout(() => {
+      joinParade('tesla', el);
+      teslaFol = parade.find(f => f.id === 'tesla');
+      teslaFol.el.classList.add('car');
+      SFX.surr();
+      naboEl.classList.add('hungry');
+    }, 700);
+  }
+  // Ioniqen smeller i en tegneserie-eksplosjon, og Teslaen ruller inn på plassen
+  function swapCars() {
+    teslaDone = true;
+    const f = teslaFol;
+    parade.splice(parade.indexOf(f), 1);
+    const cx = ioniqEl.offsetLeft + ioniqEl.offsetWidth / 2, cy = ioniqEl.offsetTop + ioniqEl.offsetHeight * .55;
+    SFX.bom();
+    const boom = (cls, size, ms, extra = {}) => {
+      const b = document.createElement('span');
+      b.className = 'boom ' + cls;
+      Object.assign(b.style, { left: `${cx - size * u / 2}px`, top: `${cy - size * u / 2}px`, width: `${size}cqh`, height: `${size}cqh` }, extra);
+      world.appendChild(b);
+      setTimeout(() => b.remove(), ms);
+      return b;
+    };
+    boom('flash', 44, 800);
+    for (let i = 0; i < 6; i++) setTimeout(() => boom('cloud', 18 + Math.random() * 10, 1900, { marginLeft: `${(Math.random() - .5) * 26}cqh`, marginTop: `${(Math.random() - .5) * 10}cqh` }), i * 90);
+    for (let i = 0; i < 10; i++) {
+      const st = boom('star', 4 + Math.random() * 3, 1500);
+      const a = Math.random() * Math.PI * 2, d = 20 + Math.random() * 25;
+      st.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${Math.cos(a) * d}cqh, ${Math.sin(a) * d - 10}cqh) rotate(${Math.random() * 720}deg)`, opacity: 0 }], { duration: 1300, easing: 'ease-out', fill: 'forwards' });
+    }
+    // Bildeler: to hjul og et dekselstykke som spretter av gårde
+    ['<circle cx="20" cy="20" r="17" fill="#1e1e1e" stroke="#3b2a20" stroke-width="3"/><path d="M8 20H32M20 8V32" stroke="#c9ced6" stroke-width="3"/>',
+     '<circle cx="20" cy="20" r="17" fill="#1e1e1e" stroke="#3b2a20" stroke-width="3"/><path d="M8 20H32M20 8V32" stroke="#c9ced6" stroke-width="3"/>',
+     '<path d="M2 30 10 6H38V30Z" fill="#9aa1a8" stroke="#3b2a20" stroke-width="3"/>'].forEach((art, i) => {
+      const p = boom('', 7, 1800, { borderRadius: 0 });
+      p.innerHTML = `<svg viewBox="0 0 40 40" style="display:block;width:100%">${art}</svg>`;
+      const dir = i === 1 ? -1 : 1;
+      p.animate([
+        { transform: 'none' },
+        { transform: `translate(${dir * (12 + i * 6)}cqh, -24cqh) rotate(${dir * 300}deg)`, offset: .45 },
+        { transform: `translate(${dir * (22 + i * 8)}cqh, 18cqh) rotate(${dir * 640}deg)`, opacity: 0 },
+      ], { duration: 1700, easing: 'ease-out', fill: 'forwards' });
+    });
+    setTimeout(() => { ioniqEl.style.visibility = 'hidden'; }, 120);
+    // Teslaen kjører inn der Ioniqen sto
+    setTimeout(() => {
+      SFX.surr();
+      const from = f.x * u, to = (ioniqEl._place.x + ioniqEl._place.w / 2) * u;
+      f.el.animate([
+        { transform: `translateX(${from}px) translateX(-50%)` },
+        { transform: `translateX(${to}px) translateX(-50%)` },
+      ], { duration: 2400, easing: 'ease-in-out', fill: 'forwards' });
+    }, 1500);
+    setTimeout(() => {
+      hearts((naboEl.offsetLeft + naboEl.offsetWidth / 2) / u - 2, 30, 4);
+      restart(naboEl, 'wiggle');
+      connect();
+    }, 4100);
+  }
+  // Nettet kommer først tilbake når både raketten og Teslaen er levert
+  function connect() {
+    if (!(rocketDone && teslaDone) || online) return;
+    satEl.classList.add('on');
+    restart(satEl, 'grow');
+    SFX.pling();
+    setTimeout(() => { beamEl.hidden = false; hus2El.classList.add('online'); SFX.pling(); }, 500);
+    setTimeout(() => {
+      wifiEl.classList.add('on');
+      online = true;
+      checkDone();
+    }, 1200);
+  }
   function deliver() {
     let did = false;
     const carried = water - delivered;
@@ -1652,14 +1767,20 @@
       }, 600);
       if (delivered >= 5) watered = true;
     }
-    if (held === 'rakett' && !online) {
+    let wait = carried > 0 ? 1400 : 200;
+    if (inParade('tesla') && !teslaDone) {
+      did = true;
+      setTimeout(swapCars, wait);
+      wait += 4400;
+    }
+    if (held === 'rakett' && !rocketDone) {
       did = true;
       setHeld(null);
-      setTimeout(launchRocket, carried > 0 ? 1400 : 200);
+      setTimeout(launchRocket, wait);
     }
     if (!did) restart(naboEl, 'wiggle');
-    if (watered && !(held === 'rakett')) naboEl.classList.toggle('hungry', !online && rocketFound);
-    if (did && !(held === 'rakett' && !online)) setTimeout(checkDone, 1500);
+    naboEl.classList.remove('hungry');
+    if (did) setTimeout(checkDone, 1500);
   }
   function flyTo(art, el) {
     const fly = document.createElement('div');
@@ -1697,14 +1818,9 @@
       ], { duration: 2300, easing: 'ease-in', fill: 'forwards' }).onfinish = () => {
         rk.remove();
         SFX.pop();
-        satEl.classList.add('on');
-        restart(satEl, 'grow');
-        setTimeout(() => { beamEl.hidden = false; hus2El.classList.add('online'); SFX.pling(); }, 500);
-        setTimeout(() => {
-          wifiEl.classList.add('on');
-          online = true;
-          checkDone();
-        }, 1200);
+        rocketDone = true;
+        restart(satEl, 'wiggle');
+        connect();
       };
       const end = performance.now() + 2200;
       (function smoke() {
@@ -1753,6 +1869,7 @@
     restart(el, 'jump');
     const a = el.dataset.id;
     const f = parade.find(p => p.el === el);
+    if (a === 'tesla') { SFX.pip(); restart(el, 'unlock'); return; }
     if (f?.family) { if (a === 'pappa') SFX.boing(); hearts(f.x - 2, 26, 3); return; }
     playRec(a);
   }
