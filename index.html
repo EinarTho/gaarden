@@ -79,7 +79,7 @@
   }
 
   /* ---------- Verden ---------- */
-  .world { width: 450cqh; }
+  .world { width: 480cqh; }
   .fence {
     position: absolute; left: 0; right: 0; bottom: 29cqh; height: 7cqh;
     background:
@@ -174,6 +174,18 @@
   .walking svg { animation: bob .34s ease-in-out infinite alternate; }
   .walking .leg-l { animation: step .34s ease-in-out infinite alternate; }
   .walking .leg-r { animation: step .34s ease-in-out infinite alternate-reverse; }
+
+  /* ---------- Mamma ---------- */
+  .m-arm { transform-box: view-box; }
+  .m-arm-l { transform-origin: 26px 57px; }
+  .m-arm-r { transform-origin: 44px 57px; }
+  .wave .m-arm-r { animation: wave 1.6s ease-in-out; }
+  .m-hugarm, .hug .m-arm { visibility: hidden; }
+  .hug .m-hugarm { visibility: visible; }
+  .hug-arms { position: absolute; bottom: 5cqh; z-index: 7; pointer-events: none; animation: regrow .25s; }
+  .hug-arms svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .heart { position: absolute; width: 4cqh; z-index: 8; pointer-events: none; animation: heart 1.8s ease-out forwards; }
+  .heart svg { display: block; width: 100%; }
 
   .bubble {
     position: absolute; z-index: 8;
@@ -319,6 +331,8 @@
   @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-4%); } }
   @keyframes step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
   @keyframes flap { from { transform: scaleX(1); } to { transform: scaleX(.3); } }
+  @keyframes wave { 15%, 85% { transform: rotate(-140deg); } 32%, 68% { transform: rotate(-112deg); } 50% { transform: rotate(-145deg); } }
+  @keyframes heart { from { transform: translateY(0) scale(.4); opacity: 1; } to { transform: translate(var(--dx), -16cqh) scale(1.2); opacity: 0; } }
   @keyframes puff { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(2cqh, -10cqh) scale(2.2); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .sun::before, .play, .nav, .tail, .smoke { animation: none; }
@@ -587,6 +601,30 @@
       <circle cx="20" cy="32" r="3" fill="#f48ea6" opacity=".6"/><circle cx="40" cy="32" r="3" fill="#f48ea6" opacity=".6"/>
       <path d="M26 33Q30 37 34 33" fill="none" stroke="#2d1e17" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 
+  const MAMMA = `<svg viewBox="0 0 70 130" aria-hidden="true"><g ${INK}>
+      <path d="M20 30C18 12 26 6 35 6S52 12 50 30C52 46 56 60 54 72H16C14 60 18 46 20 30Z" fill="#d9532c"/>
+      <rect x="26" y="104" width="7" height="20" rx="3" fill="#f6d2b5"/><rect x="37" y="104" width="7" height="20" rx="3" fill="#f6d2b5"/>
+      <path d="M23 122H34V129H21C21 125 22 122 23 122ZM36 122H47C48 122 49 125 49 129H36Z" fill="#8c2a1d"/>
+      <path d="M25 54C28 50 42 50 45 54L56 110H14Z" fill="#3fae6a"/>
+      <g class="m-hugarm"><path d="M26 57C18 62 13 66 13 75M44 57C52 62 57 66 57 75" fill="none" stroke-width="9.6"/><path d="M26 57C18 62 13 66 13 75M44 57C52 62 57 66 57 75" fill="none" stroke="#3fae6a" stroke-width="7"/></g>
+      <g class="m-arm m-arm-l"><path d="M26 57 13 88" fill="none" stroke-width="9.6"/><path d="M26 57 13 88" fill="none" stroke="#3fae6a" stroke-width="7"/><circle cx="12" cy="90" r="3.6" fill="#f6d2b5"/></g>
+      <rect x="31" y="40" width="8" height="12" fill="#f6d2b5"/>
+      <path d="M30 51 35 57 40 51" fill="none"/>
+      <ellipse cx="35" cy="28" rx="11" ry="15" fill="#f6d2b5"/>
+      <path d="M23 22C20 36 21 52 18 64C24 60 25 44 25 30ZM47 22C50 36 49 52 52 64C46 60 45 44 45 30Z" fill="#d9532c"/>
+      <path d="M23 26C22 12 28 8 35 8S48 12 47 26C44 18 38 15 33 16 29 18 26 22 23 26Z" fill="#d9532c"/>
+      <g class="m-arm m-arm-r"><path d="M44 57 57 88" fill="none" stroke-width="9.6"/><path d="M44 57 57 88" fill="none" stroke="#3fae6a" stroke-width="7"/><circle cx="58" cy="90" r="3.6" fill="#f6d2b5"/></g></g>
+      <ellipse cx="30" cy="28" rx="1.8" ry="2.3" fill="#2d1e17"/><ellipse cx="40" cy="28" rx="1.8" ry="2.3" fill="#2d1e17"/>
+      <path d="M27.5 25Q30 23.4 32.5 25M37.5 25Q40 23.4 42.5 25" fill="none" stroke="#2d1e17" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="27" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/><circle cx="43" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/>
+      <path d="M31 37Q35 41 39 37Q35 38.4 31 37Z" fill="#d23a4d" stroke="#a52a3a" stroke-width="1" stroke-linejoin="round"/></svg>`;
+  // Armene som legges rundt jenta under klemmen (ligger foran henne)
+  const MAMMA_ARMS = `<svg viewBox="0 0 70 130" aria-hidden="true">
+      <path d="M13 75C13 84 22 86 31 85M57 75C57 84 48 86 39 85" fill="none" stroke="#3b2a20" stroke-width="9.6" stroke-linecap="round"/>
+      <path d="M13 75C13 84 22 86 31 85M57 75C57 84 48 86 39 85" fill="none" stroke="#3fae6a" stroke-width="7" stroke-linecap="round"/>
+      <g stroke="#3b2a20" stroke-width="2.6"><circle cx="32" cy="85" r="3.6" fill="#f6d2b5"/><circle cx="38" cy="85" r="3.6" fill="#f6d2b5"/></g></svg>`;
+  const HEART = `<svg viewBox="0 0 20 18"><path d="M10 17C2 11 0 7 0 4.5 0 2 2 0 4.8 0 7 0 8.6 1.3 10 3 11.4 1.3 13 0 15.2 0 18 0 20 2 20 4.5 20 7 18 11 10 17Z" fill="#ff5d8f" stroke="#3b2a20" stroke-width="1.4"/></svg>`;
+
   const BUTTERFLY = `<svg class="butterfly" viewBox="0 0 40 30" aria-hidden="true"><g stroke="#3b2a20" stroke-width="1.6">
       <path class="wl" d="M20 15C12 2 2 4 4 12 6 18 14 18 20 15ZM20 15C12 20 6 28 12 28 16 28 20 22 20 15Z" fill="#ff8fc7"/>
       <path class="wr" d="M20 15C28 2 38 4 36 12 34 18 26 18 20 15ZM20 15C28 20 34 28 28 28 24 28 20 22 20 15Z" fill="#ff8fc7"/>
@@ -607,7 +645,7 @@
   const BADGES = ['ku', 'sau', 'gris', 'hest', 'hund', 'katt', 'hane', 'hone', 'and'];
 
   // ---------- Gården: x, bredde, bunn (cqh) ----------
-  const WORLD = 450;
+  const WORLD = 480;
   const PLACES = [
     { id: 'hus',      x: 8,   w: 34, art: ART.hus, smoke: [74, 2] },
     { id: 'hundehus', x: 50,  w: 13, decor: true, art: ART.hundehus },
@@ -624,6 +662,7 @@
     { id: 'blomst',   x: 416, w: 5,  art: ART.blomst('#ff6fa8') },
     { id: 'blomst',   x: 424, w: 6,  art: ART.blomst('#a77bf2'), b: 22 },
     { id: 'blomst',   x: 433, w: 5,  art: ART.blomst('#ff9a2e') },
+    { id: 'mamma',    x: 452, w: 16, b: 5, z: 5, art: MAMMA },
   ];
 
   const scene = document.getElementById('scene');
@@ -783,6 +822,10 @@
     },
     splash() { tone({ noise: true, dur: .45, attack: .01, gain: .35, filters: [['bandpass', 900, 1.2, [[1, 350]]]] }); return .45; },
     pop(at = 0) { tone({ at, type: 'sine', f: [[0, 600], [1, 1300]], dur: .14, attack: .005, gain: .4 }); return at + .2; },
+    klem() {
+      [392, 523, 659, 784].forEach((f, i) => tone({ at: i * .16, type: 'sine', f: [[0, f], [1, f]], dur: .9, attack: .04, gain: .22 }));
+      return 1.4;
+    },
     hurra() {
       [523, 659, 784, 1047].forEach((f, i) => tone({ at: i * .13, type: 'triangle', f: [[0, f], [1, f]], dur: i === 3 ? .7 : .2, attack: .01, gain: .3 }));
       return 1.1;
@@ -790,7 +833,7 @@
   };
 
   // ---------- Kamera og gåing ----------
-  const kid = { x: 30, target: 30, face: 1, walking: false };
+  const kid = { x: 30, target: 30, face: 1, walking: false, lift: 0, liftTo: 0 };
   const SPEED = 55; // cqh per sekund
   let cam = 0, maxCam = 0, u = 1, vw = 1;
   function measure() { u = scene.clientHeight / 100; vw = scene.clientWidth; maxCam = Math.max(0, WORLD * u - vw); }
@@ -807,11 +850,13 @@
       kid.face = Math.sign(dx);
     }
     if (walking !== kid.walking) { kid.walking = walking; kidEl.classList.toggle('walking', walking); }
+    momFrame(walking);
+    kid.lift += (kid.liftTo - kid.lift) * Math.min(1, dt * 10);
     cam = Math.min(maxCam, Math.max(0, kid.x * u - vw / 2));
     world.style.transform = `translate3d(${-cam}px,0,0)`;
     hills.style.transform = `translate3d(${-cam * .35}px,0,0)`;
     sky.style.transform = `translate3d(${-cam * .08}px,0,0)`;
-    kidEl.style.transform = `translateX(${kid.x * u}px) translateX(-50%) scaleX(${kid.face})`;
+    kidEl.style.transform = `translate(${kid.x * u}px, ${-kid.lift * u}px) translateX(-50%) scaleX(${kid.face})`;
     navL.hidden = cam < 2;
     navR.hidden = cam > maxCam - 2;
     requestAnimationFrame(frame);
@@ -909,12 +954,63 @@
       showBubble(el, 'Brrrom!', sec);
     },
     and(el) { restart(el, 'swim'); animal(el, 'and'); },
+    mamma() { hugPending = true; },
     blomst(el) {
       restart(el, 'grow');
       const sec = SFX.pling();
       flyButterfly(el);
     },
   };
+
+  // ---------- Mamma: vinker når jenta kommer, klemmer når man trykker ----------
+  const momEl = placeEls.find(t => t.dataset.id === 'mamma');
+  const MOM_X = momEl._place.x + momEl._place.w / 2;
+  const hugArms = document.createElement('div');
+  hugArms.className = 'hug-arms';
+  hugArms.hidden = true;
+  Object.assign(hugArms.style, { left: `${momEl._place.x}cqh`, width: `${momEl._place.w}cqh` });
+  hugArms.innerHTML = MAMMA_ARMS;
+  world.appendChild(hugArms);
+  let hugPending = false, hugging = false, waved = false;
+
+  function momFrame(walking) {
+    if (!waved && kid.x > MOM_X - 50) { waved = true; restart(momEl, 'wave'); }
+    if (waved && kid.x < MOM_X - 80) waved = false;
+    if (hugPending) {
+      if (kid.target !== MOM_X) hugPending = false;
+      else if (!walking) { hugPending = false; startHug(); }
+    }
+    if (hugging && walking) endHug();
+  }
+  function startHug() {
+    hugging = true;
+    kid.liftTo = 3.5;
+    momEl.classList.remove('wave');
+    momEl.classList.add('hug');
+    hugArms.hidden = false;
+    const sec = SFX.klem();
+    showBubble(momEl, 'Klem!', sec);
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        const h = document.createElement('span');
+        h.className = 'heart';
+        h.innerHTML = HEART;
+        h.style.setProperty('--dx', `${(Math.random() - .5) * 10}cqh`);
+        Object.assign(h.style, { left: `${MOM_X - 2 + (Math.random() - .5) * 8}cqh`, bottom: `${30 + Math.random() * 4}cqh` });
+        world.appendChild(h);
+        setTimeout(() => h.remove(), 1900);
+      }, i * 220);
+    }
+    later(momEl, '_hug', 2600, endHug);
+  }
+  function endHug() {
+    if (!hugging) return;
+    hugging = false;
+    clearTimeout(momEl._hug);
+    kid.liftTo = 0;
+    momEl.classList.remove('hug');
+    hugArms.hidden = true;
+  }
 
   function flyButterfly(el) {
     world.insertAdjacentHTML('beforeend', BUTTERFLY);
