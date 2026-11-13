@@ -219,6 +219,8 @@
   .runner > div { animation: gallop .22s ease-in-out infinite alternate; transform-origin: 30% 100%; }
   .runner > div > svg { display: block; width: 100%; height: auto; overflow: visible; }
   .runner.rear > div { animation: none; transform: rotate(-24deg); }
+  .atv > div { animation: rumble .08s linear infinite alternate; transform-origin: 25% 100%; }
+  .atv.wheelie > div { animation: none; transform: rotate(-18deg); transition: transform .25s; }
   .cans { position: absolute; left: 50%; top: 56%; display: flex; gap: .2cqh; transform: translateX(-50%); }
   .cans span { width: 3.8cqh; }
   .cans svg { display: block; width: 100%; }
@@ -449,7 +451,7 @@
 <div class="panel" id="panel" hidden>
   <div role="dialog" aria-labelledby="panelTitle">
     <h2 id="panelTitle">Om lydene</h2>
-    Dyrelydene, traktoren og bilen er ekte opptak fra Wikimedia Commons, klippet til korte lyder:
+    Dyrelydene, traktoren, bilen og firehjulingen er ekte opptak fra Wikimedia Commons, klippet til korte lyder:
     <ul>
       <li>Ku: «Single Cow Moo», MichaeltheFox8621, CC BY-SA 4.0</li>
       <li>Gris: «Pig grunt», erdie, CC BY 3.0</li>
@@ -463,6 +465,7 @@
       <li>Høne: «Hen announcing she's lain an egg», alys, fri (public domain)</li>
       <li>Traktor: «WWS JohnDeereTractor», Work With Sounds / Werstas, CC BY 4.0</li>
       <li>Bil: «Mercedes-Benz G63 – engine and exhaust sound», DEXi (YouTube), CC BY 3.0</li>
+      <li>Firehjuling: «WWS MotorcycleTOMOSD-9», Work With Sounds / Technical Museum of Slovenia, CC BY 4.0</li>
     </ul>
     Kilde: <a href="https://commons.wikimedia.org/wiki/Category:Audio_files_of_animals" target="_blank" rel="noopener">commons.wikimedia.org</a>. Epler og blomster er laget i nettleseren.
     <p><button type="button" id="panelClose">Lukk</button></p>
@@ -835,6 +838,20 @@
       <path d="M96 62H110M138 62H152" stroke="#c9ced6" stroke-width="2.4" stroke-linecap="round"/>
       <path class="tlight" d="M198 58C204 59 208 61 210 64" stroke="#ffe9a8" stroke-width="3.4" stroke-linecap="round" fill="none"/>
       <path d="M10 64H18" stroke="#e63b2e" stroke-width="4" stroke-linecap="round"/></svg>`;
+  const ATV = `<svg viewBox="0 0 120 90" aria-hidden="true"><g ${INK}>
+      <path d="M58 34 66 50 60 62" fill="none" stroke="#33415c" stroke-width="7"/>
+      <path d="M12 54C14 44 30 41 44 43H76C92 41 106 45 108 55L104 62H16Z" fill="#e63b2e"/>
+      <path d="M8 52C10 42 22 38 34 42M86 42C98 38 110 42 112 52" fill="none" stroke-width="5"/>
+      <rect x="42" y="35" width="30" height="8" rx="4" fill="#333"/>
+      <path d="M84 42 88 26M83 26H95" fill="none" stroke-width="3.4"/>
+      <rect x="50" y="10" width="16" height="26" rx="6" fill="#3f7fbf"/>
+      <path d="M62 18 86 27" fill="none" stroke="#3f7fbf" stroke-width="6"/>
+      <circle cx="59" cy="6" r="8.5" fill="#ffd34d"/>
+      <circle cx="26" cy="70" r="16" fill="#2b2b2b"/><circle cx="94" cy="70" r="16" fill="#2b2b2b"/></g>
+      <path d="M62 3H67V9H62Z" fill="#3a434d"/>
+      <circle cx="26" cy="70" r="6" fill="#9aa3ad"/><circle cx="94" cy="70" r="6" fill="#9aa3ad"/>
+      <circle cx="106" cy="51" r="3" fill="#ffe9a8"/>
+      <path d="M12 62 6 66M114 62 118 66" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/></svg>`;
   const SAT = `<svg viewBox="0 0 60 44" aria-hidden="true"><g ${INK}>
       <rect x="2" y="14" width="16" height="12" fill="#3f6fb6"/><rect x="42" y="14" width="16" height="12" fill="#3f6fb6"/>
       <path d="M18 20H21M39 20H42M30 9V3" fill="none"/>
@@ -1010,6 +1027,38 @@
       el._r = rn;
       return rn;
     });
+  // Firehjulingen kjører fram og tilbake langs hestene, med høy motorlyd som er sterkest når den er nær
+  const atvEl = document.createElement('div');
+  atvEl.className = 'runner atv l2';
+  Object.assign(atvEl.style, { width: '17cqh', bottom: '17cqh' });
+  atvEl.innerHTML = `<div>${ATV}</div>`;
+  world.insertBefore(atvEl, kidEl);
+  const atv = { el: atvEl, min: 70, max: 500, v: 58, x: 120, dir: 1, until: 0, atv: true };
+  atvEl._r = atv;
+  runners.push(atv);
+  let atvSrc = null, atvGain = null;
+  function atvSound(on) {
+    if (!on) { try { atvSrc?.stop(); } catch {} atvSrc = null; return; }
+    if (atvSrc || !BUF.atv || !audio()) return;
+    atvGain = ctx.createGain();
+    atvGain.gain.value = 0;
+    atvSrc = ctx.createBufferSource();
+    atvSrc.buffer = BUF.atv;
+    atvSrc.loop = true;
+    atvSrc.loopStart = .06;
+    atvSrc.loopEnd = BUF.atv.duration - .06;
+    atvSrc.connect(atvGain).connect(master);
+    atvSrc.start();
+  }
+  function atvFrame() {
+    if (level !== 2) return;
+    atvSound(true);
+    if (!atvGain) return;
+    const camMid = (cam + vw / 2) / u;
+    const vol = Math.max(0, 1 - Math.abs(atv.x - camMid) / 130);
+    atvGain.gain.setTargetAtTime(vol * vol, ctx.currentTime, .12);
+    atvSrc.playbackRate.setTargetAtTime(performance.now() < atv.until ? 1.45 : 1, ctx.currentTime, .15);
+  }
   function runnerFrame(dt) {
     if (level !== 2) return;
     const now = performance.now();
@@ -1024,6 +1073,14 @@
   }
   function rear(rn) {
     rn.until = performance.now() + 1100;
+    if (rn.atv) {
+      // Firehjulingen steiler og gir gass i stedet for å stå på bakbeina
+      rn.until = performance.now() + 900;
+      rn.x += rn.dir * 6;
+      rn.el.classList.add('wheelie');
+      setTimeout(() => rn.el.classList.remove('wheelie'), 900);
+      return;
+    }
     rn.el.classList.add('rear');
     playRec('hest');
     setTimeout(() => rn.el.classList.remove('rear'), 1100);
@@ -1056,7 +1113,7 @@
   }
 
   // Ekte opptak: hentes med en gang, dekodes når lyden er låst opp.
-  const RAW = {}, BUF = {}, RECS = [...BADGES, 'katt2', 'pappa', 'traktor', 'bil'];
+  const RAW = {}, BUF = {}, RECS = [...BADGES, 'katt2', 'pappa', 'traktor', 'bil', 'atv'];
   for (const id of RECS) {
     RAW[id] = fetch(`lyd/${id}.mp4`).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
   }
@@ -1196,6 +1253,7 @@
     if (walking !== kid.walking) { kid.walking = walking; kidEl.classList.toggle('walking', walking); }
     momFrame(walking);
     runnerFrame(dt);
+    atvFrame();
     paradeFrame(dt);
     carFrame();
     kid.lift += (kid.liftTo - kid.lift) * Math.min(1, dt * 10);
@@ -1645,6 +1703,7 @@
     world.querySelectorAll('.rocket-fly').forEach(e => e.remove());
   }
   function endLevel2() {
+    atvSound(false);
     scene.classList.remove('lvl2');
     level = 1;
     walkEnd = WORLD;
