@@ -1067,8 +1067,38 @@
     atvSrc.connect(atvGain).connect(master);
     atvSrc.start();
   }
+  // Svak durring fra strømmen i høyspentledningen (50 Hz med overtoner), bare i level 2
+  let humNodes = null;
+  function humSound(on) {
+    if (!on) { humNodes?.forEach(n => { try { n.stop(); } catch {} }); humNodes = null; return; }
+    if (humNodes || !audio()) return;
+    const g = ctx.createGain();
+    g.gain.value = 0;
+    g.gain.setTargetAtTime(.045, ctx.currentTime, 1);
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 700;
+    const buzz = ctx.createOscillator();
+    buzz.type = 'sawtooth';
+    buzz.frequency.value = 100;
+    const base = ctx.createOscillator();
+    base.frequency.value = 50;
+    const bg = ctx.createGain();
+    bg.gain.value = .7;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = .25;
+    const lg = ctx.createGain();
+    lg.gain.value = .015;
+    lfo.connect(lg).connect(g.gain);
+    buzz.connect(lp);
+    base.connect(bg).connect(lp);
+    lp.connect(g).connect(master);
+    humNodes = [buzz, base, lfo];
+    humNodes.forEach(o => o.start());
+  }
   function atvFrame() {
     if (level !== 2) return;
+    humSound(true);
     atvSound(true);
     if (!atvGain) return;
     const camMid = (cam + vw / 2) / u;
@@ -1726,6 +1756,7 @@
   }
   function endLevel2() {
     atvSound(false);
+    humSound(false);
     scene.classList.remove('lvl2');
     level = 1;
     walkEnd = WORLD;
