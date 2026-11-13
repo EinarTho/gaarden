@@ -210,6 +210,49 @@
     animation: exhaust 2s ease-out forwards;
   }
 
+  /* ---------- Level 2 ---------- */
+  .l2 { display: none; }
+  .lvl2 .l2 { display: block; }
+  .lvl2 .l1, .lvl2 .badges { display: none; }
+  .scene.lvl2 { --grass: #a9c95a; --grass-dark: #86a83f; --sky-top: #f3a978; --sky-low: #fde3c4; }
+  .runner { position: absolute; left: 0; z-index: 3; cursor: pointer; }
+  .runner > div { animation: gallop .22s ease-in-out infinite alternate; transform-origin: 30% 100%; }
+  .runner > div > svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .runner.rear > div { animation: none; transform: rotate(-24deg); }
+  .cans { position: absolute; left: 50%; top: 56%; display: flex; gap: .2cqh; transform: translateX(-50%); }
+  .cans span { width: 3.8cqh; }
+  .cans svg { display: block; width: 100%; }
+  .water { position: absolute; z-index: 9; top: max(1.6cqh, env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+    gap: 1cqmin; padding: 1cqmin 1.6cqmin; background: rgb(255 255 255 / .55); border-radius: 99px; pointer-events: none; }
+  .lvl2 .water.l2 { display: flex; }
+  .water i { width: clamp(26px, 6.4cqmin, 60px); aspect-ratio: 1; opacity: .3; filter: grayscale(1); transition: opacity .3s, filter .3s; }
+  .water i.got { opacity: 1; filter: none; animation: grow .6s cubic-bezier(.3,1.6,.5,1); }
+  .water svg { display: block; width: 100%; height: 100%; }
+  .sky-thing { position: absolute; z-index: 2; pointer-events: none; }
+  .sky-thing svg { display: block; width: 100%; overflow: visible; }
+  .sat .glad, .sat.on .mad { display: none; }
+  .sat.on .glad { display: inline; }
+  .sat .sled { fill: #e63b2e; animation: blink .5s ease-in-out infinite alternate; }
+  .sat.on .sled { fill: #3fd14a; }
+  .sat { animation: bob 1.6s ease-in-out infinite alternate; }
+  .wifi .arcs { stroke: #a9aeb5; }
+  .wifi .dot { fill: #a9aeb5; }
+  .wifi.on .arcs { stroke: #3fd14a; }
+  .wifi.on .dot { fill: #3fd14a; }
+  .wifi.on .slash { display: none; }
+  .wifi.on { animation: pulse .9s ease-in-out infinite; }
+  .beam { position: absolute; z-index: 2; width: 1.2cqh; pointer-events: none;
+    background: repeating-linear-gradient(#3fd14a 0 1.4cqh, transparent 1.4cqh 2.8cqh); animation: beam .45s linear infinite; }
+  .thing .led { fill: #e63b2e; }
+  .thing.online .led { fill: #3fd14a; animation: blink .5s ease-in-out infinite alternate; }
+  .naboer .glad, .naboer .scr-on, .thing.happy .sad, .thing.happy .scr-off { display: none; }
+  .thing.happy .glad, .thing.happy .scr-on { display: inline; }
+  .thing.cheer > svg { animation: hop .3s ease-in-out infinite alternate; }
+  .rocket-fly { position: absolute; left: 0; top: 0; width: 4.6cqh; z-index: 7; pointer-events: none; }
+  .rocket-fly svg { display: block; width: 100%; overflow: visible; }
+  .flame { visibility: hidden; transform-box: fill-box; transform-origin: 50% 0; }
+  .launch .flame { visibility: visible; animation: flicker .08s linear infinite alternate; }
+
   /* ---------- Mamma ---------- */
   .m-arm { transform-box: view-box; }
   .m-arm-l { transform-origin: 26px 57px; }
@@ -349,6 +392,10 @@
   @keyframes smoke { 0% { transform: translate(0, 0) scale(.6); opacity: .8; } 100% { transform: translate(1.5cqh, -7cqh) scale(1.4); opacity: 0; } }
   @keyframes exhaust { from { transform: scale(.35); opacity: .95; } to { transform: translate(-12cqh, var(--dy, -8cqh)) scale(3.6); opacity: 0; } }
   @keyframes nom { to { transform: translate(-50%, -62%) rotate(-8deg); } }
+  @keyframes gallop { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-7%) rotate(3deg); } }
+  @keyframes blink { to { opacity: .35; } }
+  @keyframes beam { to { background-position: 0 2.8cqh; } }
+  @keyframes flicker { to { transform: scaleY(1.35); } }
   @keyframes hop { from { transform: translateY(0); } to { transform: translateY(-9%); } }
   @keyframes puff { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(2cqh, -10cqh) scale(2.2); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
@@ -383,6 +430,7 @@
   </div>
 
   <div class="badges" id="badges" aria-hidden="true"></div>
+  <div class="water l2" id="water" aria-hidden="true"></div>
   <button class="nav left" id="navL" type="button" aria-label="Gå til venstre" hidden></button>
   <button class="nav right" id="navR" type="button" aria-label="Gå til høyre"></button>
   <button class="info" id="infoBtn" type="button" aria-label="Om lydene">i</button>
@@ -717,6 +765,58 @@
       <path d="M12 33 18 42M24 31 28 43M36 31 34 43M48 33 42 42" stroke="#fff" stroke-width="2.4" opacity=".8"/>
       <g transform="translate(14 0) scale(.8)">${FOOD[f].replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g></svg>`;
 
+  // ---------- Level 2: vann, rakett, naboene, satellitten ----------
+  FOOD.vann = food(`<g ${INK}><path d="M8 12H32V36C32 38 30 39 28 39H12C10 39 8 38 8 36Z" fill="#4aa8e0"/><path d="M14 12V7H26V12" fill="none"/><rect x="16" y="2" width="8" height="5" rx="1.5" fill="#2f6fb0"/></g><path d="M20 20C16 26 16 31 20 31S24 26 20 20Z" fill="#fff" opacity=".85"/>`);
+  const ROCKET_BODY = `<g ${INK}><path d="M10 2C16 8 17 18 16 30H4C3 18 4 8 10 2Z" fill="#f4f4f4"/><path d="M4 21 0 32H4ZM16 21 20 32H16Z" fill="#e63b2e"/><circle cx="10" cy="15" r="3.2" fill="#4aa8e0"/><rect x="5.5" y="30" width="9" height="4" fill="#9aa3ad"/></g>`;
+  const RAKETT = `<svg viewBox="0 0 20 46" aria-hidden="true">${ROCKET_BODY}<path class="flame" d="M6 34C5 40 10 46 10 46S15 40 14 34Z" fill="#ffb02e" stroke="#e8553d" stroke-width="1.6"/></svg>`;
+  FOOD.rakett = food(`<g transform="translate(26 2) rotate(35) scale(.85)">${ROCKET_BODY}</g>`);
+  const DROP = `<svg viewBox="0 0 40 40"><path d="M20 4C11 17 9 24 9 28A11 11 0 0 0 31 28C31 24 29 17 20 4Z" fill="#4aa8e0" stroke="#3b2a20" stroke-width="2.6" stroke-linejoin="round"/><path d="M15 27A5 5 0 0 0 20 33" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+  const HUS2 = `<svg viewBox="0 0 200 190" aria-hidden="true"><g ${INK}>
+      <path d="M150 50 162 26" fill="none" stroke-width="3"/>
+      <ellipse cx="164" cy="26" rx="14" ry="8" transform="rotate(-35 164 26)" fill="#e9edf2"/>
+      <path d="M4 84 100 20 196 84Z" fill="#b33a2a"/>
+      <rect x="20" y="82" width="160" height="104" fill="#7fb6e6"/>
+      <rect x="34" y="104" width="40" height="36" fill="#fff6d6"/><rect x="126" y="104" width="40" height="36" fill="#fff6d6"/>
+      <rect x="86" y="122" width="30" height="64" rx="3" fill="#fbf1d9"/>
+      <rect x="84" y="184" width="34" height="6" fill="#a8a29a"/></g>
+      <path d="M54 104V140M34 122H74M146 104V140M126 122H166" stroke="#3b2a20" stroke-width="2.6"/>
+      <circle class="led" cx="171" cy="20" r="4" stroke="#3b2a20" stroke-width="2"/></svg>`;
+  // Én person i naboflokken: kropp, hode, sur/glad munn og en mobil uten (eller med) nett
+  const person = (tx, ty, sc, shirt, pants, hairBack, hairFront) => `<g transform="translate(${tx} ${ty}) scale(${sc})"><g ${INK}>
+      ${hairBack}
+      <rect x="12" y="72" width="7" height="32" rx="3" fill="${pants}"/><rect x="21" y="72" width="7" height="32" rx="3" fill="${pants}"/>
+      <path d="M10 102H20V108H8C8 105 9 102 10 102ZM20 102H30C31 102 32 105 32 108H20Z" fill="#2b2b2b"/>
+      <path d="M8 42C10 36 30 36 32 42L34 76H6Z" fill="${shirt}"/>
+      <path d="M9 44 4 70" fill="none" stroke-width="8.6"/><path d="M9 44 4 70" fill="none" stroke="${shirt}" stroke-width="6"/>
+      <path d="M31 44 33 62" fill="none" stroke-width="8.6"/><path d="M31 44 33 62" fill="none" stroke="${shirt}" stroke-width="6"/>
+      <circle cx="4" cy="72" r="3" fill="#e9c3a2"/>
+      <circle cx="20" cy="22" r="13" fill="#e9c3a2"/>
+      ${hairFront}
+      <rect x="29" y="56" width="10" height="15" rx="2" fill="#2b2b2b"/></g>
+      <rect class="scr-off" x="31" y="58.5" width="6" height="10" fill="#fbe1e1"/><path class="scr-off" d="M32 60 36 67M36 60 32 67" stroke="#e63b2e" stroke-width="1.6" stroke-linecap="round"/>
+      <rect class="scr-on" x="31" y="58.5" width="6" height="10" fill="#c9f2cc"/><path class="scr-on" d="M32.2 63A3 3 0 0 1 35.8 63M33.3 65A1.4 1.4 0 0 1 34.7 65" fill="none" stroke="#2a9a38" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="33" cy="64" r="2.6" fill="#e9c3a2" stroke="#3b2a20" stroke-width="2"/>
+      <circle cx="15.5" cy="22" r="1.7" fill="#2d1e17"/><circle cx="24.5" cy="22" r="1.7" fill="#2d1e17"/>
+      <path class="sad" d="M15.5 30Q20 26.5 24.5 30M13 17.5 17 19M27 17.5 23 19" fill="none" stroke="#2d1e17" stroke-width="1.6" stroke-linecap="round"/>
+      <path class="glad" d="M15 27.5Q20 32 25 27.5" fill="none" stroke="#2d1e17" stroke-width="1.7" stroke-linecap="round"/></g>`;
+  const NABOER = `<svg class="naboer" viewBox="0 0 126 124" aria-hidden="true">
+      ${person(0, 14, 1, '#1f5a45', '#2f4f7f', '', '<path d="M8.5 23C8 33 14 37.5 20 37.5S32 33 31.5 23C30 29 26 31 20 31S10 29 8.5 23Z" fill="#b07e48"/><path d="M7 17C7 5 14 3 20 3S33 5 33 17Z" fill="#2f4fa8"/><rect x="6" y="13" width="28" height="6.5" rx="3" fill="#2a46a0"/><rect x="24" y="14" width="5" height="4" fill="#fff" stroke-width="1.2"/><g fill="rgb(255 255 255 / .25)" stroke="#2b2b2b" stroke-width="1.8"><circle cx="15.5" cy="22" r="3.8"/><circle cx="24.5" cy="22" r="3.8"/><path d="M19.3 22H20.7" fill="none"/></g>')}
+      ${person(42, 18, .96, '#cbbfa8', '#3a2f2a', '<path d="M5 22C3 8 12 5 20 5S37 8 35 22C37 30 37 39 33 44 30 41 31 35 30 31H10C9 35 10 41 7 44 3 39 3 30 5 22Z" fill="#9a6a43"/>', '<path d="M11 35C15 40 25 40 29 35L28 44H12Z" fill="#3b3a2c"/><path d="M14 39 15 47M20 40V48M26 39 25 47" stroke="#8a7a4a" stroke-width="1.4"/><path d="M7 22C6 10 13 7 20 7S34 10 33 22C31 15 26 11 21 11 15 11 10 15 7 22Z" fill="#9a6a43"/><g fill="rgb(255 255 255 / .25)" stroke="#c9a24a" stroke-width="1.2"><circle cx="15.5" cy="22" r="3.8"/><circle cx="24.5" cy="22" r="3.8"/><path d="M19.3 22H20.7" fill="none"/></g>')}
+      ${person(86, 47, .7, '#ff9a2e', '#4a6fa5', '<circle cx="5" cy="20" r="5" fill="#7a4a2a"/><circle cx="35" cy="20" r="5" fill="#7a4a2a"/>', '<path d="M7 20C7 10 13 8 20 8S33 10 33 20C29 16 24 15 20 15S11 16 7 20Z" fill="#7a4a2a"/>')}</svg>`;
+  const SAT = `<svg viewBox="0 0 60 44" aria-hidden="true"><g ${INK}>
+      <rect x="2" y="14" width="16" height="12" fill="#3f6fb6"/><rect x="42" y="14" width="16" height="12" fill="#3f6fb6"/>
+      <path d="M18 20H21M39 20H42M30 9V3" fill="none"/>
+      <circle cx="30" cy="20" r="11" fill="#d6dbe2"/></g>
+      <path d="M10 14V26M50 14V26M2 20H18M42 20H58" stroke="#8fb3e8" stroke-width="1.2"/>
+      <circle class="sled" cx="30" cy="3" r="2.8" stroke="#3b2a20" stroke-width="1.6"/>
+      <circle cx="26" cy="19.5" r="1.7" fill="#2d1e17"/><circle cx="34" cy="19.5" r="1.7" fill="#2d1e17"/>
+      <path class="mad" d="M23 15.5 28 17.5M37 15.5 32 17.5M26 26.5Q30 23 34 26.5" fill="none" stroke="#3b2a20" stroke-width="1.8" stroke-linecap="round"/>
+      <path class="glad" d="M25.5 24Q30 29 34.5 24" fill="none" stroke="#3b2a20" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+  const WIFI = `<svg viewBox="0 0 60 52" aria-hidden="true">
+      <g class="arcs" fill="none" stroke-linecap="round" stroke-width="6"><path d="M6 20A34 34 0 0 1 54 20"/><path d="M14 29A22 22 0 0 1 46 29"/><path d="M22 38A10 10 0 0 1 38 38"/></g>
+      <circle class="dot" cx="30" cy="45" r="4.5"/>
+      <path class="slash" d="M8 4 52 50" stroke="#e63b2e" stroke-width="7" stroke-linecap="round"/></svg>`;
+
   const BUTTERFLY = `<svg class="butterfly" viewBox="0 0 40 30" aria-hidden="true"><g stroke="#3b2a20" stroke-width="1.6">
       <path class="wl" d="M20 15C12 2 2 4 4 12 6 18 14 18 20 15ZM20 15C12 20 6 28 12 28 16 28 20 22 20 15Z" fill="#ff8fc7"/>
       <path class="wr" d="M20 15C28 2 38 4 36 12 34 18 26 18 20 15ZM20 15C28 20 34 28 28 28 24 28 20 22 20 15Z" fill="#ff8fc7"/>
@@ -789,21 +889,22 @@
     t.style.left = `${(i * 17.3 + (i % 3) * 5) % WORLD}cqh`;
     world.appendChild(t);
   }
-  const placeEls = PLACES.map(p => {
+  const makePlace = p => {
+    const lvl = p.l2 ? ' l2' : ' l1';
     if (p.pond) {
       const pond = document.createElement('div');
-      pond.className = 'pond';
+      pond.className = 'pond' + lvl;
       Object.assign(pond.style, { left: `${p.x - 12}cqh`, width: '38cqh', bottom: '16cqh', height: '9cqh' });
       world.appendChild(pond);
     }
     if (p.mud) {
       const mud = document.createElement('div');
-      mud.className = 'mud';
+      mud.className = 'mud' + lvl;
       Object.assign(mud.style, { left: `${p.x - 3}cqh`, width: `${p.w + 6}cqh`, bottom: '22cqh', height: '5cqh' });
       world.appendChild(mud);
     }
     const el = document.createElement('div');
-    el.className = 'thing' + (p.decor ? ' decor' : '');
+    el.className = 'thing' + (p.decor ? ' decor' : '') + lvl;
     el.dataset.id = p.id;
     el.style.setProperty('--x', `${p.x}cqh`);
     el.style.setProperty('--w', `${p.w}cqh`);
@@ -822,7 +923,76 @@
     el._place = p;
     world.insertBefore(el, kidEl);
     return el;
-  });
+  };
+  const placeEls = PLACES.map(makePlace);
+
+  // ---------- Level 2: en annen gård ----------
+  const WORLD2 = 480;
+  const PLACES2 = [
+    { id: 'bil2',    x: 4,   w: 84, b: 2,  z: 4, decor: true, art: BIL },
+    { id: 'vann',    x: 118, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'vann',    x: 172, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'vann',    x: 222, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'rakett',  x: 259, w: 5,  b: 17, z: 4, art: RAKETT },
+    { id: 'hoy2',    x: 252, w: 16, b: 10, z: 5, art: FOOD.hoy },
+    { id: 'vann',    x: 300, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'vann',    x: 348, w: 5,  b: 11, z: 4, art: FOOD.vann },
+    { id: 'naboer',  x: 380, w: 34, b: 5,  z: 5, art: NABOER },
+    { id: 'hus2',    x: 418, w: 44, decor: true, art: HUS2 },
+  ].map(p => ({ ...p, l2: true }));
+  const placeEls2 = PLACES2.map(makePlace);
+  const L2 = id => placeEls2.find(e => e.dataset.id === id);
+  const car2El = L2('bil2'), rocketEl = L2('rakett'), naboEl = L2('naboer'), hus2El = L2('hus2');
+  const skyThing = (cls, art, left, top, w) => {
+    const el = document.createElement('div');
+    el.className = `sky-thing ${cls} l2`;
+    Object.assign(el.style, { left: `${left}cqh`, top: `${top}cqh`, width: `${w}cqh` });
+    el.innerHTML = art;
+    world.appendChild(el);
+    return el;
+  };
+  const satEl = skyThing('sat', SAT, 447, 5, 13);
+  const wifiEl = skyThing('wifi', WIFI, 388, 12, 14);
+  const beamEl = document.createElement('div');
+  beamEl.className = 'beam l2';
+  Object.assign(beamEl.style, { left: `${453 - .6}cqh`, top: '15cqh', height: '27cqh' });
+  beamEl.hidden = true;
+  world.appendChild(beamEl);
+  const waterBar = document.getElementById('water');
+  const drops = Array.from({ length: 5 }, () => { const i = document.createElement('i'); i.innerHTML = DROP; waterBar.appendChild(i); return i; });
+
+  // Hester som galopperer fram og tilbake på jordet
+  const HORSE_COLORS = ['#b8763f', '#5a3420', '#e8e2d6', '#3b3b3b', '#c98a4b', '#8a5a3a', '#f0d9b5'];
+  const runners = [[95, 230, 14, 34], [150, 330, 18, 42], [60, 200, 22, 27], [230, 380, 15.5, 37], [280, 470, 20, 31], [110, 300, 25, 23], [320, 470, 13, 44]]
+    .map(([min, max, b, v], i) => {
+      const w = 15 - (b - 13) * .45;
+      const el = document.createElement('div');
+      el.className = 'runner l2';
+      Object.assign(el.style, { width: `${w}cqh`, bottom: `${b}cqh` });
+      el.innerHTML = `<div>${WALKER.hest[0].replaceAll('#b8763f', HORSE_COLORS[i])}</div>`;
+      world.insertBefore(el, kidEl);
+      const rn = { el, min, max, v, x: min + Math.random() * (max - min), dir: Math.random() < .5 ? -1 : 1, until: 0 };
+      el._r = rn;
+      return rn;
+    });
+  function runnerFrame(dt) {
+    if (level !== 2) return;
+    const now = performance.now();
+    for (const rn of runners) {
+      if (now > rn.until) {
+        rn.x += rn.dir * rn.v * dt;
+        if (rn.x > rn.max) { rn.x = rn.max; rn.dir = -1; }
+        if (rn.x < rn.min) { rn.x = rn.min; rn.dir = 1; }
+      }
+      rn.el.style.transform = `translateX(${rn.x * u}px) translateX(-50%) scaleX(${rn.dir})`;
+    }
+  }
+  function rear(rn) {
+    rn.until = performance.now() + 1100;
+    rn.el.classList.add('rear');
+    playRec('hest');
+    setTimeout(() => rn.el.classList.remove('rear'), 1100);
+  }
 
   const badgeBar = document.getElementById('badges');
   const badgeEls = Object.fromEntries(BADGES.map(id => {
@@ -936,6 +1106,11 @@
       return .55;
     },
     rasle() { tone({ noise: true, dur: .35, attack: .02, gain: .16, filters: [['highpass', 2500, .7]] }); return .35; },
+    rakett() {
+      tone({ noise: true, dur: 2.6, attack: .4, gain: .45, filters: [['lowpass', 500, .8, [[1, 1400]]]] });
+      tone({ type: 'sawtooth', f: [[0, 60], [1, 220]], dur: 2.4, attack: .3, gain: .12, filters: [['lowpass', 600, 1]] });
+      return 2.6;
+    },
     krasj() {
       tone({ noise: true, dur: .5, attack: .005, gain: .55, filters: [['bandpass', 1100, .8, [[1, 300]]]] });
       tone({ type: 'sine', f: [[0, 120], [1, 45]], dur: .35, attack: .005, gain: .6 });
@@ -962,7 +1137,7 @@
   const kid = { x: 30, target: 30, face: 1, walking: false, lift: 0, liftTo: 0 };
   const SPEED = 55; // cqh per sekund
   let cam = 0, maxCam = 0, u = 1, vw = 1;
-  let camEnd = WORLD;
+  let camEnd = WORLD, walkEnd = WORLD, level = 1;
   function measure() { u = scene.clientHeight / 100; vw = scene.clientWidth; maxCam = Math.max(0, camEnd * u - vw); }
   measure();
   addEventListener('resize', measure);
@@ -978,6 +1153,7 @@
     }
     if (walking !== kid.walking) { kid.walking = walking; kidEl.classList.toggle('walking', walking); }
     momFrame(walking);
+    runnerFrame(dt);
     paradeFrame(dt);
     carFrame();
     kid.lift += (kid.liftTo - kid.lift) * Math.min(1, dt * 10);
@@ -991,7 +1167,7 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  const walkTo = x => { kid.target = Math.min(WORLD - 6, Math.max(6, x)); };
+  const walkTo = x => { kid.target = Math.min(walkEnd - 6, Math.max(6, x)); };
 
   // ---------- Reaksjoner ----------
   function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
@@ -1071,6 +1247,10 @@
     },
     and(el) { restart(el, 'swim'); animal(el, 'and'); },
     mamma() { walkTo(MOM_X); arrive(startHug); },
+    vann(el) { restart(el, 'wiggle'); arrive(() => takeWater(el)); },
+    rakett() { arrive(takeRocket); },
+    hoy2(el) { restart(el, 'wiggle'); SFX.rasle(); if (!rocketFound) { restart(rocketEl, 'jump'); arrive(takeRocket); } },
+    naboer() { walkTo(naboEl._place.x - 6); arrive(deliver); },
     pappa(el) { restart(el, 'jump'); SFX.boing(); arrive(() => joinFamily('pappa')); },
     bil(el) {
       if (inParade('pappa')) { arrive(board); return; }
@@ -1109,7 +1289,7 @@
       else if (!walking) { const fn = pending.fn; pending = null; fn(); }
     }
     if (hugging && walking) endHug();
-    if (!driving && held !== 'kikert' && !inParade('pappa') && Math.abs(kid.x - (papEl._place.x + papEl._place.w / 2)) < 9) {
+    if (level === 1 && !driving && held !== 'kikert' && !inParade('pappa') && Math.abs(kid.x - (papEl._place.x + papEl._place.w / 2)) < 9) {
       restart(papEl, 'jump'); joinFamily('pappa');
     }
   }
@@ -1244,8 +1424,8 @@
   const carEl = placeEls.find(t => t.dataset.id === 'bil');
   const CAR_X = carEl._place.x + carEl._place.w / 2;
   const FAMILY = { mamma: [MAMMA, 16, momEl], pappa: [PAPPA, 17, papEl] };
-  function joinFamily(who) {
-    if (inParade(who) || driving) return;
+  function joinFamily(who, startX) {
+    if (inParade(who)) return;
     const [art, w, home] = FAMILY[who];
     const el = document.createElement('div');
     el.className = 'follower' + (who === 'pappa' ? ' bouncy' : '');
@@ -1254,7 +1434,7 @@
     el.innerHTML = `<div>${art}</div>`;
     world.insertBefore(el, kidEl);
     home.classList.add('away');
-    const f = { id: who, el, w, x: home._place.x + w / 2, face: -1, home, family: true };
+    const f = { id: who, el, w, x: startX ?? home._place.x + w / 2, face: -1, home, family: true };
     parade.splice(parade.filter(p => p.family).length, 0, f);
     placeFollower(f);
     if (who === 'pappa') { SFX.boing(); hearts(f.x - 2, 26, 3); }
@@ -1296,15 +1476,15 @@
       SFX.hurra();
       confetti();
     }, t0 + 4800);
-    setTimeout(resetGame, t0 + 9000);
+    setTimeout(startLevel2, t0 + 8000);
   }
   // Eksosrøyk fra bakenden av bilen, liggende igjen i verden mens bilen kjører
-  function exhaust(ms, every) {
+  function exhaust(ms, every, car = carEl) {
     const end = performance.now() + ms;
     (function puff() {
       if (performance.now() > end) return;
-      const r = carEl.getBoundingClientRect(), wr = world.getBoundingClientRect();
-      const sc = r.height / carEl.offsetHeight;
+      const r = car.getBoundingClientRect(), wr = world.getBoundingClientRect();
+      const sc = r.height / car.offsetHeight;
       if (sc < .06) { setTimeout(puff, every); return; }
       for (let k = 0; k < 2; k++) {
         const p = document.createElement('span');
@@ -1381,6 +1561,169 @@
     waved = false;
     driving = false;
   }
+  // ---------- Level 2: bilen kommer, familien går ut ----------
+  let water = 0, delivered = 0, watered = false, online = false, rocketFound = false;
+  function startLevel2() {
+    resetGame();
+    level = 2;
+    scene.classList.add('lvl2');
+    walkEnd = camEnd = WORLD2; measure();
+    resetLevel2();
+    driving = true;
+    kidEl.hidden = true;
+    kid.x = kid.target = 60;
+    car2El.querySelectorAll('.riders > g').forEach(g => { g.style.visibility = 'visible'; });
+    car2El.animate([{ transform: 'translateX(-120cqh)' }, { transform: 'none' }], { duration: 2400, easing: 'cubic-bezier(.2,.7,.3,1)' });
+    playRec('bil');
+    exhaust(2200, 90, car2El);
+    const out = (who, x, at) => setTimeout(() => {
+      car2El.querySelector(`.r-${who}`).style.visibility = 'hidden';
+      SFX.dor();
+      if (who === 'jente') { kid.x = kid.target = x; kid.face = 1; kidEl.hidden = false; }
+      else joinFamily(who, x);
+    }, at);
+    out('pappa', 70, 2900);
+    out('mamma', 56, 3400);
+    out('jente', 96, 3900);
+    setTimeout(() => { driving = false; }, 4200);
+  }
+  function resetLevel2() {
+    water = delivered = 0;
+    watered = online = rocketFound = false;
+    placeEls2.forEach(e => e.classList.remove('away', 'happy', 'cheer', 'hungry', 'online'));
+    satEl.classList.remove('on');
+    wifiEl.classList.remove('on');
+    beamEl.hidden = true;
+    drops.forEach(d => d.classList.remove('got'));
+    car2El.querySelectorAll('.riders > g').forEach(g => { g.style.visibility = ''; });
+    world.querySelectorAll('.rocket-fly').forEach(e => e.remove());
+  }
+  function endLevel2() {
+    scene.classList.remove('lvl2');
+    level = 1;
+    walkEnd = WORLD;
+    resetGame();
+    resetLevel2();
+  }
+
+  // ---------- Level 2: vann, rakett og naboene ----------
+  function takeWater(el) {
+    if (el.classList.contains('away')) return;
+    el.classList.add('away');
+    water++;
+    SFX.pop();
+    drops[water - 1]?.classList.add('got');
+    const fam = parade.filter(f => f.family);
+    const f = fam[(water - 1) % Math.max(1, fam.length)];
+    if (f) {
+      let cans = f.el.querySelector('.cans');
+      if (!cans) { cans = document.createElement('div'); cans.className = 'cans'; f.el.appendChild(cans); }
+      cans.insertAdjacentHTML('beforeend', `<span>${FOOD.vann}</span>`);
+    }
+    naboEl.classList.add('hungry');
+  }
+  function takeRocket() {
+    if (rocketFound) return;
+    rocketFound = true;
+    rocketEl.classList.add('away');
+    SFX.pling();
+    setHeld('rakett');
+    naboEl.classList.add('hungry');
+  }
+  function deliver() {
+    let did = false;
+    const carried = water - delivered;
+    if (carried > 0) {
+      did = true;
+      delivered = water;
+      parade.forEach(f => f.el.querySelector('.cans')?.remove());
+      for (let i = 0; i < carried; i++) setTimeout(() => flyTo(FOOD.vann, naboEl), i * 160);
+      setTimeout(() => {
+        SFX.nam();
+        restart(naboEl, 'wiggle');
+        hearts((naboEl.offsetLeft + naboEl.offsetWidth / 2) / u - 2, 30, 3);
+      }, 600);
+      if (delivered >= 5) watered = true;
+    }
+    if (held === 'rakett' && !online) {
+      did = true;
+      setHeld(null);
+      setTimeout(launchRocket, carried > 0 ? 1400 : 200);
+    }
+    if (!did) restart(naboEl, 'wiggle');
+    if (watered && !(held === 'rakett')) naboEl.classList.toggle('hungry', !online && rocketFound);
+    if (did && !(held === 'rakett' && !online)) setTimeout(checkDone, 1500);
+  }
+  function flyTo(art, el) {
+    const fly = document.createElement('div');
+    fly.className = 'flyfood';
+    fly.innerHTML = art;
+    world.appendChild(fly);
+    const half = 2.75 * u;
+    const x0 = (kid.x + kid.face * 3.5) * u - half, y0 = scene.clientHeight - 16 * u - half;
+    const x1 = el.offsetLeft + el.offsetWidth / 2 - half, y1 = el.offsetTop + el.offsetHeight * .4 - half;
+    fly.animate([
+      { transform: `translate(${x0}px, ${y0}px) scale(1)` },
+      { transform: `translate(${(x0 + x1) / 2}px, ${Math.min(y0, y1) - 8 * u}px) scale(1)` },
+      { transform: `translate(${x1}px, ${y1}px) scale(.4)`, opacity: .4 },
+    ], { duration: 550, easing: 'ease-in' }).onfinish = () => fly.remove();
+  }
+  // Raketten skytes opp til den sure satellitten, som blir glad og skrur på nettet igjen
+  function launchRocket() {
+    naboEl.classList.remove('hungry');
+    const rk = document.createElement('div');
+    rk.className = 'rocket-fly l2';
+    rk.innerHTML = RAKETT;
+    world.appendChild(rk);
+    const x0 = 414 * u, y0 = scene.clientHeight - 16 * u;
+    const sat = satEl.getBoundingClientRect(), wr = world.getBoundingClientRect();
+    const x1 = sat.left - wr.left + sat.width / 2 - 2.3 * u, y1 = sat.top - wr.top + sat.height;
+    rk.style.transform = `translate(${x0}px, ${y0}px)`;
+    setTimeout(() => {
+      rk.classList.add('launch');
+      SFX.rakett();
+      const ang = Math.atan2(x1 - x0, y0 - y1) * 180 / Math.PI;
+      rk.animate([
+        { transform: `translate(${x0}px, ${y0}px) rotate(0deg)` },
+        { transform: `translate(${x0 + (x1 - x0) * .2}px, ${y0 - (y0 - y1) * .35}px) rotate(${ang * .5}deg)`, offset: .45 },
+        { transform: `translate(${x1}px, ${y1}px) rotate(${ang}deg) scale(.6)` },
+      ], { duration: 2300, easing: 'ease-in', fill: 'forwards' }).onfinish = () => {
+        rk.remove();
+        SFX.pop();
+        satEl.classList.add('on');
+        restart(satEl, 'grow');
+        setTimeout(() => { beamEl.hidden = false; hus2El.classList.add('online'); SFX.pling(); }, 500);
+        setTimeout(() => {
+          wifiEl.classList.add('on');
+          online = true;
+          checkDone();
+        }, 1200);
+      };
+      const end = performance.now() + 2200;
+      (function smoke() {
+        if (performance.now() > end) return;
+        const r = rk.getBoundingClientRect();
+        const p = document.createElement('span');
+        p.className = 'exhaust';
+        Object.assign(p.style, { left: `${r.left - wr.left + r.width / 2}px`, top: `${r.bottom - wr.top}px`, width: '5cqh', height: '5cqh', margin: '-2.5cqh 0 0 -2.5cqh' });
+        world.appendChild(p);
+        setTimeout(() => p.remove(), 2100);
+        setTimeout(smoke, 70);
+      })();
+    }, 700);
+  }
+  function checkDone() {
+    if (online) naboEl.classList.add('happy');
+    if (!(watered && online)) return;
+    naboEl.classList.remove('hungry');
+    naboEl.classList.add('cheer');
+    parade.forEach((f, i) => setTimeout(() => restart(f.el, 'jump'), i * 200));
+    SFX.hurra();
+    confetti();
+    hearts((naboEl.offsetLeft + naboEl.offsetWidth / 2) / u - 2, 32, 8);
+    setTimeout(endLevel2, 7500);
+  }
+
   function placeFollower(f) {
     f.el.style.transform = `translateX(${f.x * u}px) translateX(-50%) scaleX(${f.face})`;
   }
@@ -1442,6 +1785,8 @@
       SFX.pling();
       return;
     }
+    const run = e.target.closest('.runner');
+    if (run) { rear(run._r); return; }
     const fol = e.target.closest('.follower');
     if (fol) { tapFollower(fol); return; }
     const el = e.target.closest('.thing:not(.decor)');
