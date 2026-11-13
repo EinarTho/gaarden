@@ -79,7 +79,7 @@
   }
 
   /* ---------- Verden ---------- */
-  .world { width: 660cqh; }
+  .world { width: 880cqh; }
   .fence {
     position: absolute; left: 0; right: 0; bottom: 29cqh; height: 7cqh;
     background:
@@ -88,6 +88,8 @@
       repeating-linear-gradient(90deg, var(--trim) 0 1.4cqh, transparent 1.4cqh 9cqh);
     opacity: .9;
   }
+  .fence-bit { position: absolute; left: 640cqh; width: 72cqh; bottom: 29cqh; height: 7cqh; opacity: .9; }
+  .fence-bit i { position: absolute; background: var(--trim); border-radius: .3cqh; }
   .road {
     position: absolute; left: 0; right: 0; bottom: 3cqh; height: 10cqh;
     border-radius: 99px;
@@ -183,6 +185,8 @@
   .carry { position: absolute; left: 82%; top: 60%; width: 5.5cqh; transform: translate(-50%, -50%); }
   .carry svg, .flyfood svg { display: block; width: 100%; overflow: visible; }
   .carry.new { animation: grow .5s cubic-bezier(.3,1.6,.5,1); }
+  .eating { position: absolute; left: 0; top: 0; width: 11cqh; z-index: 6; pointer-events: none; transform: translate(-50%, -50%); animation: grow .5s cubic-bezier(.3,1.6,.5,1), nom .5s ease-in-out .5s 4 alternate; }
+  .eating svg { display: block; width: 100%; overflow: visible; }
   .flyfood { position: absolute; left: 0; top: 0; width: 5.5cqh; z-index: 8; pointer-events: none; }
   .follower {
     position: absolute; left: 0; bottom: 5cqh; z-index: 5; cursor: pointer;
@@ -197,9 +201,9 @@
   .thing[data-id="pappa"] > svg { animation: hop .45s ease-in-out infinite alternate; }
   .follower.bouncy.walking > div { animation: hop .28s ease-in-out infinite alternate; }
   .riders > g { visibility: hidden; }
-  .thing.drive { transition: transform 3.4s cubic-bezier(.55,0,.85,.55); transform: translateX(210cqh); }
   .thing.drive > svg { animation: rumble .09s linear infinite alternate; }
   .thing.parked { transition: opacity .8s; }
+  .thing.drive { transform-origin: 50% 100%; }
   .exhaust {
     position: absolute; left: 0; top: 0; width: 9cqh; height: 9cqh; margin: -4.5cqh 0 0 -4.5cqh;
     border-radius: 50%; background: rgb(105 105 112 / .8); z-index: 3; pointer-events: none;
@@ -218,28 +222,6 @@
   .heart { position: absolute; width: 4cqh; z-index: 8; pointer-events: none; animation: heart 1.8s ease-out forwards; }
   .heart svg { display: block; width: 100%; }
 
-  .bubble {
-    position: absolute; z-index: 8;
-    padding: .12em .6em .2em;
-    background: #fff;
-    border: .5cqh solid var(--ink);
-    border-radius: 999px;
-    font-weight: 800;
-    font-size: clamp(22px, 6.2cqh, 60px);
-    line-height: 1.1;
-    white-space: nowrap;
-    pointer-events: none;
-    transform: translate(-50%, -100%) scale(0);
-    transform-origin: 50% 100%;
-    transition: transform .25s cubic-bezier(.3,1.7,.5,1);
-  }
-  .bubble::after {
-    content: ""; position: absolute; left: 50%; bottom: -.3em;
-    width: .5em; height: .5em; background: #fff;
-    border-right: .5cqh solid var(--ink); border-bottom: .5cqh solid var(--ink);
-    transform: translateX(-50%) rotate(45deg);
-  }
-  .bubble.show { transform: translate(-50%, -110%) scale(1); }
   .butterfly { position: absolute; left: 0; top: 0; width: 5cqh; z-index: 7; pointer-events: none; }
   .butterfly path { transform-box: fill-box; animation: flap .15s ease-in-out infinite alternate; }
   .butterfly .wr { transform-origin: 0 50%; }
@@ -366,6 +348,7 @@
   @keyframes heart { from { transform: translateY(0) scale(.4); opacity: 1; } to { transform: translate(var(--dx), -16cqh) scale(1.2); opacity: 0; } }
   @keyframes smoke { 0% { transform: translate(0, 0) scale(.6); opacity: .8; } 100% { transform: translate(1.5cqh, -7cqh) scale(1.4); opacity: 0; } }
   @keyframes exhaust { from { transform: scale(.35); opacity: .95; } to { transform: translate(-12cqh, var(--dy, -8cqh)) scale(3.6); opacity: 0; } }
+  @keyframes nom { to { transform: translate(-50%, -62%) rotate(-8deg); } }
   @keyframes hop { from { transform: translateY(0); } to { transform: translateY(-9%); } }
   @keyframes puff { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(2cqh, -10cqh) scale(2.2); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
@@ -374,7 +357,7 @@
 </style>
 
 <main class="scene" id="scene" aria-label="Gården">
-  <div class="layer" id="sky" style="width: 700cqh">
+  <div class="layer" id="sky" style="width: 800cqh">
     <div class="sun" id="sun" data-id="sol"></div>
     <div class="cloud" style="left: 40cqh; top: 14cqh"></div>
     <div class="cloud" style="left: 130cqh; top: 22cqh; width: 15cqh"></div>
@@ -382,19 +365,21 @@
     <div class="cloud" style="left: 300cqh; top: 20cqh; width: 17cqh"></div>
   </div>
   <div class="ground"></div>
-  <div class="layer" id="hills" style="width: 700cqh">
+  <div class="layer" id="hills" style="width: 800cqh">
     <div class="hill" style="left: -20cqh; width: 90cqh; height: 16cqh"></div>
     <div class="hill" style="left: 50cqh; width: 120cqh; height: 22cqh; background: #9bd774"></div>
     <div class="hill" style="left: 160cqh; width: 100cqh; height: 14cqh"></div>
     <div class="hill" style="left: 240cqh; width: 140cqh; height: 20cqh; background: #9bd774"></div>
     <div class="hill" style="left: 360cqh; width: 110cqh; height: 15cqh"></div>
     <div class="hill" style="left: 450cqh; width: 130cqh; height: 21cqh; background: #9bd774"></div>
+    <div class="hill" style="left: 560cqh; width: 120cqh; height: 16cqh"></div>
   </div>
   <div class="world" id="world">
-    <div class="fence"></div>
+    <div class="fence" style="right: auto; width: 640cqh"></div>
+    <div class="fence" style="left: 712cqh"></div>
+    <div class="fence-bit" id="fenceBit"></div>
     <div class="road"></div>
     <div class="kid" id="kid"></div>
-    <div class="bubble" id="bubble"></div>
   </div>
 
   <div class="badges" id="badges" aria-hidden="true"></div>
@@ -634,9 +619,11 @@
       <path d="M13 72 18 44C20 38 40 38 42 44L47 72Z" fill="#ffd23f"/>
       <path d="M19 46 11 64M41 46 49 64" fill="none" stroke="#ffd23f" stroke-width="7"/>
       <circle cx="11" cy="65" r="3.4" fill="#f6d2b5"/><circle cx="49" cy="65" r="3.4" fill="#f6d2b5"/>
-      <circle cx="9" cy="24" r="6" fill="#f2cf5b"/><circle cx="51" cy="24" r="6" fill="#f2cf5b"/>
+      <circle cx="10" cy="15" r="5.5" fill="#f2cf5b"/><circle cx="50" cy="15" r="5.5" fill="#f2cf5b"/>
+      <path d="M12 26C12 11 20 7 30 7S48 11 48 26V37C48 41 43 42 42 38V28H18V38C17 42 12 41 12 37Z" fill="#f2cf5b"/>
       <circle cx="30" cy="25" r="16" fill="#f6d2b5"/>
-      <path d="M14 24C14 12 22 8 30 8S46 12 46 24C40 20 34 16 30 14 26 18 20 22 14 24Z" fill="#f2cf5b"/></g>
+      <path d="M14.5 22C14.5 12 21 8.5 30 8.5S45.5 12 45.5 22C43.5 20.5 41.5 21.5 39.5 20 37.5 21.5 35 21.5 33 20 31 21.5 28.5 21.5 26.5 20 24.5 21.5 22 21.5 20 20 18 21.5 16 21 14.5 22Z" fill="#f2cf5b"/>
+      <circle cx="13.5" cy="18" r="2.2" fill="#e63b2e"/><circle cx="46.5" cy="18" r="2.2" fill="#e63b2e"/></g>
       <circle cx="24" cy="27" r="2.2" fill="#2d1e17"/><circle cx="36" cy="27" r="2.2" fill="#2d1e17"/>
       <circle cx="20" cy="32" r="3" fill="#f48ea6" opacity=".6"/><circle cx="40" cy="32" r="3" fill="#f48ea6" opacity=".6"/>
       <path d="M26 33Q30 37 34 33" fill="none" stroke="#2d1e17" stroke-width="1.8" stroke-linecap="round"/></svg>`;
@@ -692,7 +679,7 @@
       <rect x="90" y="28" width="48" height="38" rx="3" fill="#bfe3f5"/>
       <path d="M144 28H188L196 66H144Z" fill="#bfe3f5"/></g>
       <g class="riders">
-        <g class="r-jente">${head(60, 54, 10, '#f6d2b5', [`<circle cx="49" cy="52" r="4.5" fill="#f2cf5b"/><circle cx="71" cy="52" r="4.5" fill="#f2cf5b"/>`, `<path d="M50 51C50 42 56 43 60 43S70 42 70 51C66 47 63 46 60 46S53 48 50 51Z" fill="#f2cf5b"/>`])}</g>
+        <g class="r-jente">${head(60, 54, 10, '#f6d2b5', [`<circle cx="49" cy="52" r="4.5" fill="#f2cf5b"/><circle cx="71" cy="52" r="4.5" fill="#f2cf5b"/>`, `<path d="M50.5 51C50 43 55 42.5 60 42.5S70 43 69.5 51C68 50 66.5 50.5 65 49.5 63.5 50.5 61.5 50.5 60 49.5 58.5 50.5 56.5 50.5 55 49.5 53.5 50.5 52 50 50.5 51Z" fill="#f2cf5b"/>`])}</g>
         <g class="r-mamma">${head(114, 48, 11, '#f6d2b5', [`<g fill="#d9532c"><circle cx="102" cy="40" r="7"/><circle cx="126" cy="40" r="7"/><circle cx="114" cy="34" r="8"/><circle cx="100" cy="54" r="7"/><circle cx="128" cy="54" r="7"/><circle cx="101" cy="66" r="6"/><circle cx="127" cy="66" r="6"/></g>`, `<path d="M104 44C104 36 124 36 124 44 120 40 108 40 104 44Z" fill="#d9532c"/>`])}</g>
         <g class="r-pappa">${head(168, 47, 11, '#f6d2b5', ['', `<path d="M157 45C156 35 162 33 168 33S180 35 179 45C176 40 172 39 167 39S159 41 157 45Z" fill="#f2cf5b"/>`])}
           <g fill="none" stroke="#111" stroke-width="2.2"><rect x="160" y="43" width="7" height="6" rx="2"/><rect x="169" y="43" width="7" height="6" rx="2"/><path d="M167 46H169"/></g></g>
@@ -716,7 +703,11 @@
     hoy: food(`<g ${INK}><path d="M3 36C3 18 11 7 20 7S37 18 37 36Z" fill="#f2cf5b"/></g><path d="M12 32 14 18M20 32V13M28 32 26 18M8 33 9 26M32 33 31 26" fill="none" stroke="#c99a2e" stroke-width="2" stroke-linecap="round"/>`),
     korn: food(`<g ${INK}><path d="M13 13C10 19 6 25 6 31 6 36 12 38 20 38S34 36 34 31C34 25 30 19 27 13Z" fill="#d9b98a"/><path d="M13 14C12 7 28 7 27 14Z" fill="#f2cf5b"/></g><path d="M12 13H28" stroke="#8a6a3a" stroke-width="2.4" stroke-linecap="round"/><g fill="#c99a2e"><circle cx="17" cy="10" r="1.3"/><circle cx="21" cy="9" r="1.3"/><circle cx="24" cy="11" r="1.3"/></g>`),
     bein: food(`<g transform="rotate(-30 20 20)"><g ${INK} fill="#fffaf0"><circle cx="9" cy="15" r="5"/><circle cx="9" cy="25" r="5"/><circle cx="31" cy="15" r="5"/><circle cx="31" cy="25" r="5"/></g><rect x="9" y="15.2" width="22" height="9.6" fill="#fffaf0"/><path d="M11 15H29M11 25H29" stroke="#3b2a20" stroke-width="2.6" stroke-linecap="round"/></g>`),
-    pasta: food(`<g ${INK}><path d="M6 15C8 7 13 11 15 6 18 11 22 5 25 9 28 5 32 10 34 15Z" fill="#f6d36b"/><path d="M3 17H37C37 28 30 35 20 35S3 28 3 17Z" fill="#fff"/></g><path d="M10 13Q13 9 16 13T22 12T29 12" fill="none" stroke="#d9a93a" stroke-width="1.6" stroke-linecap="round"/><circle cx="20" cy="10" r="4.5" fill="#d23a2a" stroke="#3b2a20" stroke-width="2"/><path d="M8 24H32" stroke="#4aa8e0" stroke-width="2.4" stroke-linecap="round"/>`),
+    pasta: food(`<path d="M27 1 33 15" stroke="#3b2a20" stroke-width="4.4" stroke-linecap="round"/><path d="M27 1 33 15" stroke="#c9ced6" stroke-width="2.2" stroke-linecap="round"/>
+      <g ${INK}><path d="M5 17C4 9 11 4 20 4S36 9 35 17Z" fill="#f6d36b"/></g>
+      <path d="M8 14C11 9 14 15 17 9S23 14 26 8 30 13 32 14M9 10C13 6 17 11 21 6S27 10 30 9M12 16C15 12 19 17 22 12S28 16 31 15" fill="none" stroke="#d9a93a" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M13 9C15 5 25 5 27 9 25 13 15 13 13 9Z" fill="#d23a2a" stroke="#3b2a20" stroke-width="1.6"/><circle cx="17" cy="8" r="2.4" fill="#8c3a26"/><circle cx="23" cy="8.5" r="2.4" fill="#8c3a26"/>
+      <g ${INK}><path d="M2 17H38C38 28 30 36 20 36S2 28 2 17Z" fill="#fff"/></g><path d="M7 25H33" stroke="#4aa8e0" stroke-width="2.4" stroke-linecap="round"/>`),
     kikert: food(`<g ${INK}><path d="M3 17H37C37 28 30 35 20 35S3 28 3 17Z" fill="#fff"/></g><g stroke="#3b2a20" stroke-width="1.6"><rect x="8" y="9" width="8" height="8" rx="1.5" fill="#f08a2e" transform="rotate(-12 12 13)"/><rect x="24" y="8" width="8" height="8" rx="1.5" fill="#f08a2e" transform="rotate(10 28 12)"/><circle cx="19" cy="13" r="3.6" fill="#e8c98a"/><circle cx="13" cy="17" r="3.4" fill="#e8c98a"/><circle cx="25" cy="17" r="3.4" fill="#e8c98a"/><circle cx="31" cy="16" r="3.2" fill="#e8c98a"/><circle cx="18" cy="7" r="3.2" fill="#e8c98a"/></g><path d="M8 24H32" stroke="#5fb548" stroke-width="2.4" stroke-linecap="round"/>`),
     melk: food(`<g ${INK}><path d="M15 6H25V11C25 14 30 16 30 21V35C30 37 28 38 26 38H14C12 38 10 37 10 35V21C10 16 15 14 15 11Z" fill="#fff"/><rect x="14" y="2" width="12" height="5" rx="2" fill="#4aa8e0"/></g><path d="M12 25H28" stroke="#4aa8e0" stroke-width="3"/>`),
   };
@@ -746,7 +737,8 @@
   const BADGES = ['ku', 'sau', 'gris', 'hest', 'hund', 'katt', 'hane', 'hone', 'and'];
 
   // ---------- Gården: x, bredde, bunn (cqh) ----------
-  const WORLD = 660;
+  const WORLD = 660;     // gården; veien fortsetter videre så bilen har plass å kjøre
+  const ROAD_END = 880;
   const PLACES = [
     { id: 'hus',      x: 8,   w: 34, art: ART.hus, smoke: [74, 2] },
     { id: 'melk',     x: 33,  w: 4.5, b: 12, z: 4, art: FOOD.melk },
@@ -766,7 +758,7 @@
     { id: 'blomst',   x: 416, w: 5,  art: ART.blomst('#ff6fa8') },
     { id: 'blomst',   x: 424, w: 6,  art: ART.blomst('#a77bf2'), b: 22 },
     { id: 'blomst',   x: 433, w: 5,  art: ART.blomst('#ff9a2e') },
-    { id: 'pasta',    x: 440, w: 10, b: 11, z: 4, art: picnic('pasta') },
+    { id: 'pasta',    x: 438, w: 13, b: 11, z: 4, art: picnic('pasta') },
     { id: 'mamma',    x: 452, w: 16, b: 5, z: 5, art: MAMMA },
     { id: 'kikert',   x: 504, w: 10, b: 11, z: 4, art: picnic('kikert') },
     { id: 'pappa',    x: 518, w: 17, b: 5, z: 5, art: PAPPA },
@@ -788,7 +780,6 @@
   const sky = document.getElementById('sky');
   const hills = document.getElementById('hills');
   const kidEl = document.getElementById('kid');
-  const bubble = document.getElementById('bubble');
   const navL = document.getElementById('navL'), navR = document.getElementById('navR');
   kidEl.innerHTML = KID;
 
@@ -860,7 +851,7 @@
   }
 
   // Ekte opptak: hentes med en gang, dekodes når lyden er låst opp.
-  const RAW = {}, BUF = {}, RECS = [...BADGES, 'katt2', 'traktor', 'bil'];
+  const RAW = {}, BUF = {}, RECS = [...BADGES, 'katt2', 'pappa', 'traktor', 'bil'];
   for (const id of RECS) {
     RAW[id] = fetch(`lyd/${id}.mp4`).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
   }
@@ -945,6 +936,12 @@
       return .55;
     },
     rasle() { tone({ noise: true, dur: .35, attack: .02, gain: .16, filters: [['highpass', 2500, .7]] }); return .35; },
+    krasj() {
+      tone({ noise: true, dur: .5, attack: .005, gain: .55, filters: [['bandpass', 1100, .8, [[1, 300]]]] });
+      tone({ type: 'sine', f: [[0, 120], [1, 45]], dur: .35, attack: .005, gain: .6 });
+      [.05, .14, .22, .33].forEach(at => tone({ at, type: 'square', f: [[0, 520 + Math.random() * 300], [1, 300]], dur: .05, attack: .002, gain: .12, filters: [['bandpass', 900, 2]] }));
+      return .6;
+    },
     tut() {
       [0, .3].forEach(at => tone({ at, type: 'square', f: [[0, 415], [1, 415]], dur: .2, attack: .01, gain: .12, filters: [['lowpass', 1400, 1]] }));
       return .6;
@@ -965,7 +962,8 @@
   const kid = { x: 30, target: 30, face: 1, walking: false, lift: 0, liftTo: 0 };
   const SPEED = 55; // cqh per sekund
   let cam = 0, maxCam = 0, u = 1, vw = 1;
-  function measure() { u = scene.clientHeight / 100; vw = scene.clientWidth; maxCam = Math.max(0, WORLD * u - vw); }
+  let camEnd = WORLD;
+  function measure() { u = scene.clientHeight / 100; vw = scene.clientWidth; maxCam = Math.max(0, camEnd * u - vw); }
   measure();
   addEventListener('resize', measure);
 
@@ -981,6 +979,7 @@
     if (walking !== kid.walking) { kid.walking = walking; kidEl.classList.toggle('walking', walking); }
     momFrame(walking);
     paradeFrame(dt);
+    carFrame();
     kid.lift += (kid.liftTo - kid.lift) * Math.min(1, dt * 10);
     cam = Math.min(maxCam, Math.max(0, kid.x * u - vw / 2));
     world.style.transform = `translate3d(${-cam}px,0,0)`;
@@ -997,23 +996,11 @@
   // ---------- Reaksjoner ----------
   function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
   function later(el, key, ms, fn) { clearTimeout(el[key]); el[key] = setTimeout(fn, ms); }
-  let bubbleTimer;
-  function showBubble(el, text, sec) {
-    if (!text) return;
-    bubble.textContent = text;
-    bubble.style.left = `${el.offsetLeft + el.offsetWidth / 2}px`;
-    bubble.style.top = `${el.offsetTop}px`;
-    restart(bubble, 'show');
-    clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(() => bubble.classList.remove('show'), (sec + 1.8) * 1000);
-  }
-
   const found = new Set();
   let celebrating = false;
   function animal(el, id, extraSec = 0) {
     const a = ANIMAL[id];
     const sec = Math.max(playRec(id), .6) + extraSec;
-    showBubble(el, a.word, sec);
     if (!found.has(id)) {
       found.add(id);
       badgeEls[id].classList.add('got');
@@ -1042,7 +1029,6 @@
         SFX.plopp(.55);
       }
       restart(el, 'wiggle');
-      showBubble(el, 'Eple!', 1);
       if (apples.every(a => a.classList.contains('fall'))) {
         later(el, '_t', 2500, () => apples.forEach(a => { a.classList.remove('fall', 'taken'); restart(a, 'regrow'); }));
       }
@@ -1082,21 +1068,20 @@
           setTimeout(() => p.remove(), 1400);
         }, i * 350);
       }
-      showBubble(el, 'Brrrom!', sec);
     },
     and(el) { restart(el, 'swim'); animal(el, 'and'); },
-    mamma() { arrive(startHug); },
-    pappa(el) { restart(el, 'jump'); SFX.boing(); showBubble(el, 'Hei!', .6); arrive(() => joinFamily('pappa')); },
+    mamma() { walkTo(MOM_X); arrive(startHug); },
+    pappa(el) { restart(el, 'jump'); SFX.boing(); arrive(() => joinFamily('pappa')); },
     bil(el) {
       if (inParade('pappa')) { arrive(board); return; }
-      SFX.tut(); restart(el, 'wiggle'); showBubble(el, 'Tut tut!', .6);
+      SFX.tut(); restart(el, 'wiggle');
     },
-    melk(el) { restart(el, 'wiggle'); SFX.pop(); showBubble(el, 'Melk!', .6); },
-    hundehus(el) { restart(el, 'wiggle'); SFX.pop(); showBubble(el, 'Et bein!', .6); },
-    korn(el) { restart(el, 'wiggle'); SFX.rasle(); showBubble(el, 'Korn!', .6); },
-    hoy(el) { restart(el, 'wiggle'); SFX.rasle(); showBubble(el, 'Høy!', .6); },
-    pasta(el) { restart(el, 'wiggle'); SFX.pop(); showBubble(el, 'Pasta!', .6); },
-    kikert(el) { restart(el, 'wiggle'); SFX.pop(); showBubble(el, 'Kikerter og søtpotet!', .6); },
+    melk(el) { restart(el, 'wiggle'); SFX.pop(); },
+    hundehus(el) { restart(el, 'wiggle'); SFX.pop(); },
+    korn(el) { restart(el, 'wiggle'); SFX.rasle(); },
+    hoy(el) { restart(el, 'wiggle'); SFX.rasle(); },
+    pasta(el) { restart(el, 'wiggle'); SFX.pop(); },
+    kikert(el) { restart(el, 'wiggle'); SFX.pop(); },
     blomst(el) {
       restart(el, 'grow');
       const sec = SFX.pling();
@@ -1125,7 +1110,7 @@
     }
     if (hugging && walking) endHug();
     if (!driving && held !== 'kikert' && !inParade('pappa') && Math.abs(kid.x - (papEl._place.x + papEl._place.w / 2)) < 9) {
-      restart(papEl, 'jump'); showBubble(papEl, 'Hei!', .6); joinFamily('pappa');
+      restart(papEl, 'jump'); joinFamily('pappa');
     }
   }
   function startHug() {
@@ -1135,7 +1120,6 @@
     momEl.classList.add('hug');
     hugArms.hidden = false;
     const sec = SFX.klem();
-    showBubble(momEl, 'Klem!', sec);
     hearts(MOM_X - 2, 30, 6);
     if (parade.length) {
       parade.forEach((f, i) => setTimeout(() => restart(f.el, 'jump'), 200 + i * 150));
@@ -1216,9 +1200,21 @@
     setTimeout(() => {
       SFX.nam();
       restart(el, 'wiggle');
-      showBubble(el, 'Nam nam!', .6);
       hearts((el.offsetLeft + el.offsetWidth / 2) / u - 2, 100 - el.offsetTop / u - 4, 3);
     }, 500);
+    if (FAMILY[a]) {
+      // Mamma og pappa holder skåla foran seg og spiser, så det er tydelig hva de får
+      const bowl = document.createElement('div');
+      bowl.className = 'eating';
+      bowl.innerHTML = FOOD[f];
+      Object.assign(bowl.style, { left: `${el.offsetLeft + el.offsetWidth / 2}px`, top: `${el.offsetTop + el.offsetHeight * .46}px` });
+      setTimeout(() => world.appendChild(bowl), 450);
+      if (a === 'pappa' && BUF.pappa) playRec('pappa', .5);
+      else setTimeout(() => SFX.nam(), 1300);
+      setTimeout(() => SFX.nam(), 2100);
+      setTimeout(() => { bowl.remove(); REACT[el.dataset.id]?.(el); }, 3000);
+      return;
+    }
     setTimeout(() => { REACT[el.dataset.id]?.(el); }, 1400);
     if (!FAMILY[a]) setTimeout(() => joinParade(a, el), 2600);
   }
@@ -1289,6 +1285,8 @@
       exhaust(Math.min(2500, sec * 450), 140);
       setTimeout(() => {
         carEl.classList.add('drive');
+        driveStart = performance.now();
+        camEnd = ROAD_END; measure();
         exhaust(3800, 55);
       }, Math.min(2500, sec * 450));
     }, t0);
@@ -1306,9 +1304,12 @@
     (function puff() {
       if (performance.now() > end) return;
       const r = carEl.getBoundingClientRect(), wr = world.getBoundingClientRect();
+      const sc = r.height / carEl.offsetHeight;
+      if (sc < .06) { setTimeout(puff, every); return; }
       for (let k = 0; k < 2; k++) {
         const p = document.createElement('span');
         p.className = 'exhaust';
+        Object.assign(p.style, { width: `${9 * sc}cqh`, height: `${9 * sc}cqh`, margin: `${-4.5 * sc}cqh 0 0 ${-4.5 * sc}cqh` });
         p.style.left = `${r.left - wr.left + r.width * .04 + (Math.random() - .5) * 2 * u}px`;
         p.style.top = `${r.top - wr.top + r.height * .72 + (Math.random() - .5) * 2 * u}px`;
         p.style.setProperty('--dy', `${-4 - Math.random() * 8}cqh`);
@@ -1320,7 +1321,46 @@
       setTimeout(puff, every);
     })();
   }
+  // Gjerdestykket bilen kjører gjennom: stolper og spiler som kan fly hver sin vei
+  const fenceBit = document.getElementById('fenceBit');
+  const planks = [];
+  for (let i = 0; i < 8; i++) planks.push(Object.assign(document.createElement('i'), { style: `left:${i * 9 + 3}cqh;top:0;width:1.4cqh;height:100%` }));
+  for (let i = 0; i < 4; i++) for (const top of [30, 70]) planks.push(Object.assign(document.createElement('i'), { style: `left:${i * 18}cqh;top:${top}%;width:18cqh;height:.9cqh` }));
+  planks.forEach(p => fenceBit.appendChild(p));
+  let broken = false;
+  function breakFence() {
+    broken = true;
+    SFX.krasj();
+    planks.forEach(p => {
+      const dx = 4 + Math.random() * 16, up = 6 + Math.random() * 14, rot = (Math.random() - .5) * 540;
+      p._anim = p.animate([
+        { transform: 'none', opacity: 1 },
+        { transform: `translate(${dx * .6}cqh, ${-up}cqh) rotate(${rot / 2}deg)`, opacity: 1, offset: .4 },
+        { transform: `translate(${dx}cqh, ${6 + Math.random() * 8}cqh) rotate(${rot}deg)`, opacity: 0 },
+      ], { duration: 1300 + Math.random() * 500, easing: 'ease-out', fill: 'forwards' });
+    });
+  }
+  function mendFence() { broken = false; planks.forEach(p => p._anim?.cancel()); }
+
+  // Bilen kjører litt bortover veien, svinger ut gjennom gjerdet og blir mindre og mindre innover mot åsene
+  let driveStart = 0;
+  function carFrame() {
+    if (!driveStart) return;
+    const t = (performance.now() - driveStart) / 1000;
+    const k = Math.max(0, t - 1.6);
+    const kk = Math.min(k, 4.75);
+    const dx = t < 1.6 ? 18 * t * t : 46 + 57 * kk - 6 * kk * kk;
+    const lift = 52 * (1 - Math.exp(-k / 1.1));
+    const sc = Math.exp(-Math.max(0, k - .6));
+    carEl.style.transform = `translate(${dx}cqh, ${-lift}cqh) scale(${sc})`;
+    carEl.style.opacity = sc < .08 ? Math.max(0, (sc - .03) / .05) : '';
+    if (!broken && lift > 22) breakFence();
+    kid.x = kid.target = CAR_X + dx;
+  }
   function resetGame() {
+    driveStart = 0;
+    mendFence();
+    camEnd = WORLD; measure();
     for (const f of parade.splice(0)) {
       f.el.classList.add('leaving');
       setTimeout(() => f.el.remove(), 600);
@@ -1330,6 +1370,8 @@
     carEl.style.opacity = '0';
     setTimeout(() => {
       carEl.classList.remove('drive');
+      carEl.style.transform = '';
+      carEl.style.opacity = '0';
       carEl.querySelectorAll('.riders > g').forEach(g => { g.style.visibility = ''; });
       requestAnimationFrame(() => { carEl.style.opacity = ''; });
     }, 900);
@@ -1362,13 +1404,7 @@
     const a = el.dataset.id;
     const f = parade.find(p => p.el === el);
     if (f?.family) { if (a === 'pappa') SFX.boing(); hearts(f.x - 2, 26, 3); return; }
-    const sec = Math.max(playRec(a), .6);
-    bubble.textContent = ANIMAL[a].word;
-    bubble.style.left = `${f.x * u}px`;
-    bubble.style.top = `${scene.clientHeight - el.offsetHeight - 5 * u}px`;
-    restart(bubble, 'show');
-    clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(() => bubble.classList.remove('show'), (sec + 1.8) * 1000);
+    playRec(a);
   }
 
   function flyButterfly(el) {
@@ -1415,7 +1451,11 @@
       el._tap = now;
       const id = el.dataset.id, a = animalOf(id);
       walkTo(el._place.x + el._place.w / 2);
-      if (held && a && EATS[a].includes(held) && !inParade(a)) { arrive(() => feed(el, a)); return; }
+      if (held && a && EATS[a].includes(held) && !inParade(a)) {
+        if (FAMILY[a]) walkTo(el._place.x - 6);  // stå ved siden av, så skåla synes
+        arrive(() => feed(el, a));
+        return;
+      }
       REACT[id]?.(el);
       if (SOURCE[id]) arrive(() => pickUp(el, SOURCE[id]));
       return;
