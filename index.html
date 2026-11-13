@@ -125,9 +125,9 @@
   }
   .eggs i.on { transform: scale(1); }
   .smoke {
-    position: absolute; width: 3cqh; height: 3cqh; border-radius: 50%;
-    background: rgb(255 255 255 / .85);
-    animation: puff 2.6s ease-out infinite;
+    position: absolute; width: 2.2cqh; height: 2.2cqh; border-radius: 50%;
+    background: rgb(150 150 150 / .6);
+    animation: smoke 2.6s ease-out infinite;
   }
   .puff {
     position: absolute; width: 4cqh; height: 4cqh; border-radius: 50%;
@@ -333,6 +333,7 @@
   @keyframes flap { from { transform: scaleX(1); } to { transform: scaleX(.3); } }
   @keyframes wave { 15%, 85% { transform: rotate(-140deg); } 32%, 68% { transform: rotate(-112deg); } 50% { transform: rotate(-145deg); } }
   @keyframes heart { from { transform: translateY(0) scale(.4); opacity: 1; } to { transform: translate(var(--dx), -16cqh) scale(1.2); opacity: 0; } }
+  @keyframes smoke { 0% { transform: translate(0, 0) scale(.6); opacity: .8; } 100% { transform: translate(1.5cqh, -7cqh) scale(1.4); opacity: 0; } }
   @keyframes puff { 0% { transform: translate(0, 0) scale(.5); opacity: .9; } 100% { transform: translate(2cqh, -10cqh) scale(2.2); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     .sun::before, .play, .nav, .tail, .smoke { animation: none; }
@@ -602,22 +603,23 @@
       <path d="M26 33Q30 37 34 33" fill="none" stroke="#2d1e17" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 
   const MAMMA = `<svg viewBox="0 0 70 130" aria-hidden="true"><g ${INK}>
-      <path d="M20 30C18 12 26 6 35 6S52 12 50 30C52 46 56 60 54 72H16C14 60 18 46 20 30Z" fill="#d9532c"/>
+      <circle cx="35" cy="3" r="7" fill="#d9532c"/><circle cx="24" cy="5" r="7" fill="#d9532c"/><circle cx="46" cy="5" r="7" fill="#d9532c"/><circle cx="15" cy="11" r="7.5" fill="#d9532c"/><circle cx="55" cy="11" r="7.5" fill="#d9532c"/><circle cx="9" cy="21" r="7.5" fill="#d9532c"/><circle cx="61" cy="21" r="7.5" fill="#d9532c"/><circle cx="7" cy="32" r="7.5" fill="#d9532c"/><circle cx="63" cy="32" r="7.5" fill="#d9532c"/><circle cx="8" cy="43" r="7.5" fill="#d9532c"/><circle cx="62" cy="43" r="7.5" fill="#d9532c"/><circle cx="11" cy="54" r="7" fill="#d9532c"/><circle cx="59" cy="54" r="7" fill="#d9532c"/><circle cx="16" cy="63" r="6.5" fill="#d9532c"/><circle cx="54" cy="63" r="6.5" fill="#d9532c"/><path d="M12 20C14 4 56 4 58 20 62 34 62 50 56 62H14C8 50 8 34 12 20Z" fill="#d9532c" stroke="none"/><path d="M32.55 3A2.45 2.45 0 1 1 35 5.45 M21.55 5A2.45 2.45 0 1 1 24 7.45 M43.55 5A2.45 2.45 0 1 1 46 7.45 M12.375 11A2.625 2.625 0 1 1 15 13.625 M52.375 11A2.625 2.625 0 1 1 55 13.625 M6.375 21A2.625 2.625 0 1 1 9 23.625 M58.375 21A2.625 2.625 0 1 1 61 23.625 M4.375 32A2.625 2.625 0 1 1 7 34.625 M60.375 32A2.625 2.625 0 1 1 63 34.625 M5.375 43A2.625 2.625 0 1 1 8 45.625 M59.375 43A2.625 2.625 0 1 1 62 45.625 M8.55 54A2.45 2.45 0 1 1 11 56.45 M56.55 54A2.45 2.45 0 1 1 59 56.45 M13.725 63A2.275 2.275 0 1 1 16 65.275 M51.725 63A2.275 2.275 0 1 1 54 65.275" fill="none" stroke="#a8361b" stroke-width="1.3"/>
       <rect x="26" y="104" width="7" height="20" rx="3" fill="#f6d2b5"/><rect x="37" y="104" width="7" height="20" rx="3" fill="#f6d2b5"/>
       <path d="M23 122H34V129H21C21 125 22 122 23 122ZM36 122H47C48 122 49 125 49 129H36Z" fill="#8c2a1d"/>
       <path d="M25 54C28 50 42 50 45 54L56 110H14Z" fill="#3fae6a"/>
       <g class="m-hugarm"><path d="M26 57C18 62 13 66 13 75M44 57C52 62 57 66 57 75" fill="none" stroke-width="9.6"/><path d="M26 57C18 62 13 66 13 75M44 57C52 62 57 66 57 75" fill="none" stroke="#3fae6a" stroke-width="7"/></g>
       <g class="m-arm m-arm-l"><path d="M26 57 13 88" fill="none" stroke-width="9.6"/><path d="M26 57 13 88" fill="none" stroke="#3fae6a" stroke-width="7"/><circle cx="12" cy="90" r="3.6" fill="#f6d2b5"/></g>
-      <rect x="31" y="40" width="8" height="12" fill="#f6d2b5"/>
+      <rect x="31" y="40" width="8" height="13" fill="#f6d2b5"/>
       <path d="M30 51 35 57 40 51" fill="none"/>
-      <ellipse cx="35" cy="28" rx="11" ry="15" fill="#f6d2b5"/>
-      <path d="M23 22C20 36 21 52 18 64C24 60 25 44 25 30ZM47 22C50 36 49 52 52 64C46 60 45 44 45 30Z" fill="#d9532c"/>
-      <path d="M23 26C22 12 28 8 35 8S48 12 47 26C44 18 38 15 33 16 29 18 26 22 23 26Z" fill="#d9532c"/>
+      <ellipse cx="35" cy="27" rx="10" ry="18" fill="#f6d2b5"/>
+      <circle cx="26" cy="10" r="5" fill="#d9532c"/><circle cx="35" cy="8" r="5.5" fill="#d9532c"/><circle cx="44" cy="10" r="5" fill="#d9532c"/><circle cx="21" cy="17" r="4.5" fill="#d9532c"/><circle cx="49" cy="17" r="4.5" fill="#d9532c"/><path d="M24.25 10A1.75 1.75 0 1 1 26 11.75 M33.075 8A1.925 1.925 0 1 1 35 9.925 M42.25 10A1.75 1.75 0 1 1 44 11.75 M19.425 17A1.575 1.575 0 1 1 21 18.575 M47.425 17A1.575 1.575 0 1 1 49 18.575" fill="none" stroke="#a8361b" stroke-width="1.3"/>
+      <circle cx="20" cy="51" r="5.5" fill="#d9532c"/><circle cx="50" cy="51" r="5.5" fill="#d9532c"/><circle cx="18" cy="61" r="5" fill="#d9532c"/><circle cx="52" cy="61" r="5" fill="#d9532c"/><path d="M18.075 51A1.925 1.925 0 1 1 20 52.925 M48.075 51A1.925 1.925 0 1 1 50 52.925 M16.25 61A1.75 1.75 0 1 1 18 62.75 M50.25 61A1.75 1.75 0 1 1 52 62.75" fill="none" stroke="#a8361b" stroke-width="1.3"/>
       <g class="m-arm m-arm-r"><path d="M44 57 57 88" fill="none" stroke-width="9.6"/><path d="M44 57 57 88" fill="none" stroke="#3fae6a" stroke-width="7"/><circle cx="58" cy="90" r="3.6" fill="#f6d2b5"/></g></g>
-      <ellipse cx="30" cy="28" rx="1.8" ry="2.3" fill="#2d1e17"/><ellipse cx="40" cy="28" rx="1.8" ry="2.3" fill="#2d1e17"/>
-      <path d="M27.5 25Q30 23.4 32.5 25M37.5 25Q40 23.4 42.5 25" fill="none" stroke="#2d1e17" stroke-width="1.2" stroke-linecap="round"/>
-      <circle cx="27" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/><circle cx="43" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/>
-      <path d="M31 37Q35 41 39 37Q35 38.4 31 37Z" fill="#d23a4d" stroke="#a52a3a" stroke-width="1" stroke-linejoin="round"/></svg>`;
+      <ellipse cx="30.5" cy="26" rx="1.8" ry="2.4" fill="#2d1e17"/><ellipse cx="39.5" cy="26" rx="1.8" ry="2.4" fill="#2d1e17"/>
+      <path d="M28 22.8Q30.5 21.2 33 22.8M37 22.8Q39.5 21.2 42 22.8" fill="none" stroke="#2d1e17" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M35 29Q36.4 32.5 34.6 33.4" fill="none" stroke="#c9967a" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="28" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/><circle cx="42" cy="34" r="2.6" fill="#f48ea6" opacity=".55"/>
+      <path d="M31.5 38Q35 42 38.5 38Q35 39.4 31.5 38Z" fill="#d23a4d" stroke="#a52a3a" stroke-width="1" stroke-linejoin="round"/></svg>`;
   // Armene som legges rundt jenta under klemmen (ligger foran henne)
   const MAMMA_ARMS = `<svg viewBox="0 0 70 130" aria-hidden="true">
       <path d="M13 75C13 84 22 86 31 85M57 75C57 84 48 86 39 85" fill="none" stroke="#3b2a20" stroke-width="9.6" stroke-linecap="round"/>
@@ -984,7 +986,7 @@
   }
   function startHug() {
     hugging = true;
-    kid.liftTo = 3.5;
+    kid.liftTo = 2.5;
     momEl.classList.remove('wave');
     momEl.classList.add('hug');
     hugArms.hidden = false;
